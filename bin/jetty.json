@@ -1,0 +1,26 @@
+  {
+
+      "server": "0.0.0.0"
+    , "port"  : 8080
+
+    , "contexts": [
+
+         {
+              "context-path": "/"
+            , "webapp-path": "../build/exploded"
+            , "virtual-hosts": [
+                "desktop-fa2ith5.producersmarket.com"
+            ]
+        }
+
+        , {
+              "context-path": "/js"
+            , "webapp-path": "../../../Javapoet/ispaces-javascript-server/build/exploded"
+            , "virtual-hosts": [
+                "desktop-fa2ith5.producersmarket.com"
+            ]
+        }
+        
+    ]
+
+}

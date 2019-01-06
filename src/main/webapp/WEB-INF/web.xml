@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<web-app 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee"
+  xmlns:c="http://java.sun.com/jsp/jstl/core"
+  xmlns:fmt="http://java.sun.com/jsp/jstl/fmt"
+  xmlns:web="http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+  version="3.1"
+>
+
+  <description>iSpaces Calendar App</description>
+  <display-name>iSpaces Calendar App</display-name>
+
+  <!-- This app is cluster-ready -->
+  <distributable />
+
+  <session-config>
+    <session-timeout>33</session-timeout>
+  </session-config>
+
+  <servlet>
+    <servlet-name>app</servlet-name>
+    <servlet-class>com.ispaces.js.control.AppControl</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>app</servlet-name>
+    <url-pattern>/app</url-pattern>
+    <url-pattern>/app/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>init</servlet-name>
+    <servlet-class>com.ispaces.servlet.InitServlet</servlet-class>
+    <init-param>
+      <param-name>init.properties</param-name>
+      <param-value>WEB-INF/conf/init.properties</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+<!--
+  <servlet>
+    <servlet-name>static</servlet-name>
+    <servlet-class>org.eclipse.jetty.servlet.DefaultServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>static</servlet-name>
+    <url-pattern>/css/*</url-pattern>
+    <url-pattern>/js/*</url-pattern>
+    <url-pattern>/img/*</url-pattern>                               
+    <url-pattern>/fonts/*</url-pattern>                               
+  </servlet-mapping>
+-->    
+
+  <welcome-file-list>
+    <welcome-file>index.jsp,index.html</welcome-file>
+  </welcome-file-list>
+
+  <error-page>
+    <error-code>404</error-code>
+    <location>/ApplicationExceptionController</location>
+  </error-page>
+  
+  <error-page>
+    <exception-type>javax.servlet.ServletException</exception-type>
+    <location>/ApplicationExceptionController</location>
+  </error-page>
+
+  <mime-mapping>
+    <extension>css</extension>
+    <mime-type>text/css</mime-type>
+  </mime-mapping>
+
+<!--
+  <security-constraint>
+    <web-resource-collection>
+      <url-pattern>/*</url-pattern>
+    </web-resource-collection>
+    <user-data-constraint>
+      <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+    </user-data-constraint>
+  </security-constraint>
+-->
+
+</web-app>
