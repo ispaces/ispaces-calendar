@@ -196,8 +196,7 @@ Ispaces.Common.extend(
              * Create the ResizableWindow setting a reference to this.resizableWindow.
              * Order is especially important here, in that the DraggableApplication required the reference to 'this.resizableWindow' to be set.
              */
-            var resizableWindow=new Ispaces.ResizableWindow(_this);
-            _this.resizableWindow=resizableWindow; // DraggableApplication requires this reference to the ResizableWindow to be set.
+            var resizableWindow = this.resizableWindow = new Ispaces.ResizableWindow(this); // DraggableApplication requires this.resizableWindow
             var titlebar=resizableWindow.createTitlebar();  // Some applications might not want the titlebar. Leave it up to the application to decide if it wants to create one.
             
             //new Ispaces.DraggableApplication(_this,titlebar);

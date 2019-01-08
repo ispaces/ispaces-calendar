@@ -17,8 +17,8 @@
 %>
 
 <%
+
     String serverUrl = (String)application.getAttribute("serverUrl");
-    //String contextUrl = InitServlet.properties.getProperty("contextUrl");
     String contextUrl = (String)application.getAttribute("contextUrl");
     String backendUrl = (String)application.getAttribute("backendUrl");
 
@@ -31,7 +31,7 @@
 <html>
 
 <head>
-<title>Instagram API Browser</title>
+<title>Ispaces Calendar</title>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
 
 <style type="text/css">
