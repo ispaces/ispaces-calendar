@@ -87,246 +87,60 @@ body
 --%>
 }
 
-.InstagramApiBrowser
+.Calendar
 {
-<%--
   border: blue 1px solid;
-  border: 0px;
---%>
-}
-
-.instagram-api-widget
-{
 <%--
   border: 0px;
-  border: #000 1px solid;
-  border: #4169E1 1px solid;
-  width:100%;
-  border: #000 1px solid;
---%>
-  height: 30px;
-  padding:2px;
-}
-
-.instagram-api-widget .cell-base-url
-{
-<%--
-  border: black 1px solid;
-  border: 0px;
---%>
-  vertical-align: middle;
-  margin: auto;
-  font-size:20px;
-  padding-left:10px;
-  white-space: nowrap;
-}
-
-.instagram-api-widget .cell-forward-slash
-{
-<%--
-  border: black 1px solid;
-  border: 0px;
-  border: red 1px solid;
---%>
-  vertical-align: middle;
-  margin: auto;
-  height: 30px;
-  font-size:20px;
-  padding-left:0px;
-}
-
-.instagram-api-widget .cell-select-endpoint
-{
-<%--
-  border: black 1px solid;
-  border: 0px;
-  border: red 1px solid;
---%>
-  border: 0px;
-  vertical-align: top;
-  height: 30px;
-  width: 100px;
-  margin: auto;
-  position: relative;
-}
-
-ul.select
-{
-  position: relative;
-<%--
-  border: 0px;
-  border: red 1px solid;
-  border: 0px;
---%>
-  text-align:left;
-  vertical-align:top;
-  padding-left:0px;
-  margin:0px;
-  margin-top: 0px;
-  margin-left: 0px;
-  padding-top: 0px;
-  padding-left: 1px;
-  height: 28px;
-}
-
-ul.select li
-{
-  display: none;
-  cursor: default;
-  white-space: nowrap;
-  vertical-align: top;
-  margin-top: 0px;
-  margin-left: 0px;
-  padding-top: 0px;
-  padding-left: 0px;
-  font-size: 15px;
-  font-weight: 500;
-<%--
-  border: red 1px solid;
-  padding-right: 3px;
-  padding-left: 3px;
 --%>
 }
 
-ul.select li.selected
+table.month
 {
-<%--
-  border: blue 1px solid;
-  margin-left: 1px;
-  padding-right: 3px;
-  padding-left: 3px;
-  padding: 0px;
---%>
-  border: transparent 1px solid;
-  display: block;
-  vertical-align: top;
-  background-color: #fff;
-  height: 28px;
-  line-height: 28px;
-  color: #000;
-  font-size:20px;
-}
-
-ul.select li.selected:hover
-{
-  border: #ccc 1px solid;
-}
-
-<%--
-U+25BC BLACK DOWN-POINTING TRIANGLE
-U+25BE SMALL BLACK DOWN-POINTING TRIANGLE
---%>
-ul.select li.selected:after
-{
-  content: "\25BE";
-<%--
-  border: green 1px solid;
-  font-family:ispaces;
-  font-size:5px;
-  content:'v';
-  margin: auto;
-  margin: auto 2px auto 2px;
-  margin: auto 1px auto 1px;
---%>
-  margin: auto 2px auto 2px;
-  border: #ccc 1px solid;
-  vertical-align: middle;
-  text-align: center;
-  display:inline-block;
-  height:18px;
-  min-height:18px;
-  width:18px;
-  min-width:18px;
-  line-height:18px;
-}
-
-ul.select-open
-{
-  position: absolute;
-  margin:0px;
-  padding:0px;
-  padding-left:0px;
-  text-align:left;
-  vertical-align:top;
-  color: #4169E1;
+  width: 100%;
+  height: 100%;
   /*
-  color:rgb(65, 105, 225);
+  */
+  background-color: #ccc;
+}
+
+div.month-div
+{
   border: red 1px solid;
-  */
-  border: #000 1px solid;
-  font-weight: normal;
-  font-family: arial;
-  <%--= boxShadow3_25 --%>
 }
 
-ul.select-open li
+table.month th
 {
-  display: block;
-  cursor: pointer;
-  text-align: left;
-  display: block;
-  vertical-align: top;
-  background-color: #fff;
-  height: 28px;
-  line-height: 28px;
-  color: #000;
-  /*
-  margin-left: 0px;
-  */
-  margin: 0px;        
-  padding: 0px;
-  padding-left: 3px;
-  font-size:20px;
+  color:#6c6c6c;
+  background:#f0f3fe;
+  font-weight:bold;
+  font-size:14px;
 }
 
-.instagram-button
+table.month td.weekend
 {
-<%--
-  border: 0px;
-  padding:0px 10px;
---%>
-  border: #666 1px solid;
-  vertical-align: middle;
-  margin: auto;
-  font-size:20px;
-  white-space: nowrap;
-  cursor: pointer;
+  background:#ebeffe;
 }
 
-.large-button
+table.month td.weekend-on
 {
-<%--
-  border: black 1px solid;
-  border: 0px;
-  padding:0px 10px;
---%>
-  vertical-align: middle;
-  margin: auto;
-  font-size:20px;
-  white-space: nowrap;
-  cursor: pointer;
+  background:#ffcc00;
+  color:#fff;
 }
 
-@media (max-width: 767) {
-    /* your custom css class on a parent will increase specificity */
-    /* so this rule will override Bootstrap's font size setting */
-    .autosized .label { font-size: 14px; }
+table.month td.today
+{
+  background:#fffccc;
 }
 
-@media (min-width: 768px) and (max-width: 991px) {
-    .autosized .label { font-size: 16px; }
+/*
+*/
+table.month td, table.month td.off
+{
+  background:#fff;
 }
 
-@media (min-width: 992px) and (max-width: 1199px) {
-    .autosized .label { font-size: 18px; }
-}
-
-@media (min-width: 1200px) {
-    .autosized .label { font-size: 20px; }
-}
 </style>
-
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
 </head>
 <body>

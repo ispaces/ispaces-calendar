@@ -146,7 +146,10 @@ Ispaces.Common.extend(
             body.add(this.divApplication);
 
             //this.populateData();
-            this.createMonthCalendar();
+
+            this.monthDiv = this.createMonthCalendar();
+            this.divMain.add(this.monthDiv);
+
             this.refreshMonth();
 
             //_this.setDimensions(); // A call to set the dimensions of the window after it has been built and added to the DOM.
@@ -213,6 +216,10 @@ Ispaces.Common.extend(
             , cellMain = createDivCell(divMain).setClass("cell-main")
             , rowMain = createDivRow(cellMain)
 
+            divMain.setHeightPercent(100);
+            cellMain.setHeightPercent(100);
+            rowMain.setHeightPercent(100);
+
             /*
             var bottomMenu = this.createBottomMenu()
             , cellBottom = createDivCell(bottomMenu)
@@ -243,7 +250,8 @@ Ispaces.Common.extend(
             divTable.setWidthHeightPercent(100);
             divTable.setOverflow(Ispaces.Constants.Properties.HIDDEN);
 
-            return Create.createDiv(divTable);
+            //return Create.createDiv(divTable);
+            return Create.createDiv(divTable).setHeightPercent(100);
 
         //} // createApplication()
 
@@ -1391,34 +1399,40 @@ Ispaces.Common.extend(
 
         , createMonthCalendar:function(){
             Ispaces.logger.debug(this.classId+'.createMonthCalendar()');
+            //Ispaces.logger.alert(this.classId+'.createMonthCalendar()');
+            //alert(this.classId+'.createMonthCalendar()');
 
-            this.monthDiv = this.Create.createDiv();
+            var ElementNames = Ispaces.Constants.ElementNames;
 
-            //this.monthTable=Ispaces.Create.table(null,1);
-            this.monthTable = Ispaces.Create.createHtmlTable(null,1);
+            var monthDiv = this.Create.createDiv().setClass('month-div');
+            monthDiv.setHeightPercent(100);
+
+            var monthTable = this.monthTable = Ispaces.Create.createHtmlTable(null,1);
             //this.monthTable.ba('#ccc');
             //this.monthTable.wiphip(100);
             this.monthTable.setClass('month');
 
-            var tHead = this.Create.createElement(Ispaces.Constants.ElementNames.THEAD);
+            var tHead = this.Create.createElement(ElementNames.THEAD);
 
-            var tableHeight=7;
-            var tr=this.Create.createElement(Ispaces.Constants.ElementNames.TR);
-            for(var i=0;i<this.daysInWeek;i++){
-                var th=this.Create.createElement(Ispaces.Constants.ElementNames.TH);
+            var tableHeight = 7;
+            var tr = this.Create.createElement(ElementNames.TR);
+
+            for(var i = 0; i < this.daysInWeek; i++) {
+
+                var th = this.Create.createElement(ElementNames.TH);
                 //th.alCM();
                 //th.wip(100/this.daysInWeek);
                 //th.hi(this.heightDayHeader);
-                //th.add(this.Create.createText(this.DAYS_ABBR[i]));
-                //tr.add(th);
+                th.add(this.Create.createText(this.DAYS_ABBR[i]));
+                tr.add(th);
             }
 
             tHead.add(tr);
-            this.monthTable.add(tHead);
+            monthTable.add(tHead);
 
-            this.monthDiv.add(this.monthTable);
-            this.divMain.add(this.monthDiv);
+            monthDiv.add(monthTable);
 
+            return monthDiv;
         }
 
         , createWeekCalendar : function() {
