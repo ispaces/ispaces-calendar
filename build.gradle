@@ -1,79 +1,56 @@
-apply plugin: 'java'
-targetCompatibility = "1.8"
-sourceCompatibility = "1.8"
-apply plugin: 'war'
-//apply plugin: 'appengine'
-
 buildscript {
-
-  repositories {
-    mavenCentral()
-  }
-
-  //dependencies {
-  //  classpath 'com.google.appengine:gradle-appengine-plugin:1.9.54'
-  //}
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'org.gretty:gretty:+'
+    }
 }
 
 repositories {
-    mavenCentral()
+    jcenter()
 }
 
-/*
+apply plugin: 'java'
+apply plugin: 'war'
+apply plugin: 'org.gretty'
+
+targetCompatibility = "1.8"
+sourceCompatibility = "1.8"
+
 List compileList =  [
-
-      "log4j:log4j:1.2.17"
-    , "commons-lang:commons-lang:2.6"
-    , "commons-net:commons-net:3.5"
-    , "org.json:json:20140107"
-    , "javax.servlet:javax.servlet-api:3.1.0"
-    , "com.sun.mail:mailapi:1.5.6"
-    , "com.sun.mail:smtp:1.5.6"
-    , "mysql:mysql-connector-java:6.0.5"
-
-    , "org.eclipse.jetty:jetty-server:9.4.6.v20170531"
-    , "org.eclipse.jetty:jetty-continuation:9.4.6.v20170531"
-    , "org.eclipse.jetty:jetty-http:9.4.6.v20170531"
-    , "org.eclipse.jetty:jetty-server:9.4.6.v20170531"
-    , "org.eclipse.jetty:jetty-servlets:9.4.6.v20170531"
-    , "org.eclipse.jetty:jetty-servlet:9.4.6.v20170531"
-    , "org.eclipse.jetty:jetty-webapp:9.4.6.v20170531"
-    , "org.eclipse.jetty:jetty-util:9.4.6.v20170531"
-
-    //, files('./src/main/webapp/WEB-INF/lib/ispaces-database-0.1.2.20.jar')
-    //, files('./src/main/webapp/WEB-INF/lib/ispaces-javascript-server-0.0.0.9.jar')
-    , fileTree(dir: 'src/main/webapp/WEB-INF/lib', include: '*.jar')
-    //, fileTree(dir: 'libs', include: ['*.jar'])
-]
-*/
-List compileList =  [
-
-      "org.apache.logging.log4j:log4j-core:2.8.2"
-    , "javax.servlet:javax.servlet-api:4.0.0"
+      "javax.servlet:javax.servlet-api:${project.property('servlet.version')}"
+    , "org.apache.logging.log4j:log4j-core:${project.property('log4j.version')}"
+    , "org.apache.logging.log4j:log4j-api:${project.property('log4j.version')}"
     , "commons-lang:commons-lang:2.6"
     , "commons-net:commons-net:3.5"
     , "org.json:json:20140107"
     , "com.sun.mail:mailapi:1.5.6"
     , "com.sun.mail:smtp:1.5.6"
     , "mysql:mysql-connector-java:8.0.11"
-    , "org.eclipse.jetty:jetty-annotations:9.4.7.v20170914"
-    , "org.eclipse.jetty:jetty-server:9.4.7.v20170914"
-    , "org.eclipse.jetty:jetty-continuation:9.4.7.v20170914"
-    , "org.eclipse.jetty:jetty-http:9.4.7.v20170914"
-    , "org.eclipse.jetty:jetty-server:9.4.7.v20170914"
-    , "org.eclipse.jetty:jetty-servlets:9.4.7.v20170914"
-    , "org.eclipse.jetty:jetty-servlet:9.4.7.v20170914"
-    , "org.eclipse.jetty:jetty-webapp:9.4.7.v20170914"
-    , "org.eclipse.jetty:jetty-util:9.4.7.v20170914"
-    , "com.atlassian.commonmark:commonmark:0.10.0"
+    //, "com.atlassian.commonmark:commonmark:0.10.0"
     , "org.eclipse.jetty:apache-jsp:9.4.7.v20170914"
     , "org.mortbay.jasper:apache-el:8.5.23"
+    , "org.eclipse.jetty:jetty-annotations:${project.property('jetty.version')}"
+    , "org.eclipse.jetty:jetty-server:${project.property('jetty.version')}"
+    , "org.eclipse.jetty:jetty-continuation:${project.property('jetty.version')}"
+    , "org.eclipse.jetty:jetty-http:${project.property('jetty.version')}"
+    , "org.eclipse.jetty:jetty-server:${project.property('jetty.version')}"
+    , "org.eclipse.jetty:jetty-servlets:${project.property('jetty.version')}"
+    , "org.eclipse.jetty:jetty-servlet:${project.property('jetty.version')}"
+    , "org.eclipse.jetty:jetty-webapp:${project.property('jetty.version')}"
+    , "org.eclipse.jetty:jetty-util:${project.property('jetty.version')}"
     , fileTree(dir: 'src/main/webapp/WEB-INF/lib', include: '*.jar')
 ]
 
+gretty {
+    servletContainer = 'jetty9.4'
+    loggingLevel = 'DEBUG'
+}
+
 /*
-* For dependencies that should not go into the War, use the "providedCompile" or "providedRuntime" scope.
-*/
+ * For dependencies that should not go into the war file, use the "providedCompile" or "providedRuntime" scope.
+ */
 List providedCompileList = [
   //"javax.servlet:servlet-api:2.5"
   //"javax.servlet:servlet-api:3.1"
@@ -81,87 +58,68 @@ List providedCompileList = [
 ]
 
 dependencies {
-
-  compile compileList
-  providedCompile providedCompileList
-
-  //runtime "org.eclipse.jetty:jetty-servlet:8.1.7.v20120910"
-  //runtime "org.eclipse.jetty:jetty-util:8.1.7.v20120910"
-  //runtime "org.eclipse.jetty:jetty-servlet:9.4.1.v20170120"
-  //runtime "org.eclipse.jetty:jetty-util:9.4.1.v20170120"
+    compile compileList
+    providedCompile providedCompileList
 }
 
 task deleteProperties(type: Delete) {
-
     println 'Executing '+project.name+'.deleteProperties(type: Delete)'
-
     delete 'src/main/webapp/WEB-INF/init.properties'
     followSymlinks = true
 }
 
 task copyView(type: Copy) {
-
     println 'Executing copyView'
-
     from('src/main/webapp/view') {
         include '**'
         exclude '**/*.bak'
     }
-    
     into 'build/exploded-app/view'
 }
 
 task copyJavascript(type: Copy) {
-
     println 'Executing copyJavascript'
-
     from('src/main/js') {
         include '**/*.*'
         exclude '**/*.bak'
     }
-
     //into '../../ispaces/ispaces-javascript-server/src/main/webapp/view/js/classes'
     into '../ispaces-javascript-server/src/main/webapp/view/js/classes'
     //into 'src/main/webapp/view/js/classes'
 }
 
 task deployJavascript(type: Copy) {
-
     println 'Executing deployJavascript'
-
     from('src/main/js') {
         include '**/*.*'
         exclude '**/*.bak'
     }
-
     //into '../../ispaces/ispaces-javascript-server/build/exploded-app/view/js/classes'
-    into '../ispaces-javascript-server/build/exploded/view/js/classes'
+    //into '../ispaces-javascript-server/build/exploded/view/js/classes'
+    into '../../Javapoet/ispaces-javascript-server/build/exploded/view/js/classes'
     //into 'build/exploded/view/js/classes'
 }
 
 import org.apache.tools.ant.filters.ReplaceTokens
 
-task dev(dependsOn: [deleteProperties, copyView, copyJavascript]) << {
-
-  println 'dev()'
-  println System.getenv("USERNAME")
-  println System.getenv("USERDOMAIN")
-  
-  def props = new Properties()
-  //file("src/main/resources/"+System.getenv("USERNAME")+".properties").withInputStream { props.load(it) }
-  file("src/main/resources/"+System.getenv("USERDOMAIN")+".properties").withInputStream { props.load(it) }
-  
-  println props.getProperty("protocol") +" "+props.getProperty("server") +":"+props.getProperty("port")
-  
-  copy {
-    from 'src/main/resources/init.properties'
-    into 'src/main/webapp/WEB-INF'
-    filter(
-      ReplaceTokens
-      , tokens: props
-    )
-  }
-
+//task dev(dependsOn: [deleteProperties, copyView, copyJavascript]) {
+task dev(dependsOn: [copyView, copyJavascript]) {
+    println 'dev()'
+    //println System.getenv("USERNAME")
+    //println System.getenv("USERDOMAIN")
+    def props = new Properties()
+    //file("src/main/resources/"+System.getenv("USERNAME")+".properties").withInputStream { props.load(it) }
+    //file("src/main/resources/"+System.getenv("USERDOMAIN")+".properties").withInputStream { props.load(it) }
+    file("src/main/config/dev.properties").withInputStream { props.load(it) }
+    println props.getProperty("protocol") +" "+props.getProperty("server") +":"+props.getProperty("port")
+    copy {
+        from 'src/main/config/init.properties'
+        into 'src/main/webapp/WEB-INF'
+        filter(
+          ReplaceTokens
+          , tokens: props
+        )
+    }
 }
 
 /*

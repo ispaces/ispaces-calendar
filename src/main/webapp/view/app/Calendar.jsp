@@ -9,19 +9,16 @@
 
 <%!
     org.apache.logging.log4j.Logger logger;
-    
     public void jspInit() { // Create static variables here.
         logger = org.apache.logging.log4j.LogManager.getLogger();
         logger.debug("jspInit()");
-    } // end jspInit() method
+    }
 %>
 
 <%
-
     String serverUrl = (String)application.getAttribute("serverUrl");
     String contextUrl = (String)application.getAttribute("contextUrl");
     String backendUrl = (String)application.getAttribute("backendUrl");
-
 %>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -94,6 +91,104 @@ body
   border: 0px;
 --%>
 }
+
+.buttons .positive-notop0
+{
+  background:#D2E0FA;
+  border-top:#fff 1px solid;
+  border-left:#fff 1px solid;
+  border-right:1px #5a5a5a solid;
+  border-bottom:1px #5a5a5a solid;
+  text-shadow:#fff 0px 1px 0, #333 0 -1px 0;
+  color:#5A5A5A;
+}
+
+.buttons .positive-notop1
+{
+  background:#a5c0f5;
+  border-top:#DAE3FB 1px solid;
+  border-left:#DAE3FB 1px solid;
+  border-right:1px #5a5a5a solid;
+  border-bottom:1px #5a5a5a solid;
+  text-shadow:#D2E0FA 0px 1px 0, #333 0 -1px 0;
+  color:#5A5A5A;
+}
+
+.buttons .positive-notop12
+{
+  /*
+  background:#a5c0f5 url(http://stage.ispaces.com/view/images/bump/dev/e5e9ef-fff-1x28a.gif) repeat;
+  */
+  background:#a5c0f5;
+  border-top:#dae3fb 1px solid;
+  border-left:1px #E0E7FC solid;
+  border-right:1px #00618c solid;
+  border-bottom:1px #00618c solid;
+  color:#636563;
+}
+
+.buttons .topmenu
+{
+  background:#a5c0f5;
+  border-top:#dae3fb 1px solid;
+  border-left:1px #E0E7FC solid;
+  border-right:1px #00618c solid;
+  border-bottom:1px #00618c solid;
+  color:#636563;
+}
+
+.buttons .topmenu-right
+{
+  /*
+  background:#a5c0f5 url(http://stage.ispaces.com/view/images/arrow/blue/right.gif) no-repeat center center;
+  */
+  background:#a5c0f5;
+  border-top:#dae3fb 1px solid;
+  border-left:1px #E0E7FC solid;
+  border-right:1px #00618c solid;
+  border-bottom:1px #00618c solid;
+  color:#636563;
+}
+
+.buttons .topmenu-right:hover
+{
+  /*
+  background:#a5c0f5 url(http://stage.ispaces.com/view/images/arrow/blue/right-on.gif) no-repeat center center;
+  */
+  background:#a5c0f5;
+  border-top:#dae3fb 1px solid;
+  border-left:1px #E0E7FC solid;
+  border-right:1px #00618c solid;
+  border-bottom:1px #00618c solid;
+  color:#636563;
+}
+
+.buttons .topmenu-left
+{
+  /*
+  background:#a5c0f5 url(http://stage.ispaces.com/view/images/arrow/blue/left.gif) no-repeat center center;
+  */
+  background:#a5c0f5;
+  border-top:#dae3fb 1px solid;
+  border-left:1px #E0E7FC solid;
+  border-right:1px #00618c solid;
+  border-bottom:1px #00618c solid;
+  color:#636563;
+}
+
+.buttons .topmenu-left:hover
+{
+  /*
+  background:#a5c0f5 url(http://stage.ispaces.com/view/images/arrow/blue/left-on.gif) no-repeat center center;
+  */
+  background:#a5c0f5;
+  border-top:#dae3fb 1px solid;
+  border-left:1px #E0E7FC solid;
+  border-right:1px #00618c solid;
+  border-bottom:1px #00618c solid;
+  color:#636563;
+}
+
 
 table.month
 {
@@ -247,7 +342,6 @@ table.month td, table.month td.off
           , 'backendUrl': backendUrl
         };
 
-        //alert('InstagramApiBrowser = '+InstagramApiBrowser);
         Ispaces.Calendar.start(config);
     };
 
