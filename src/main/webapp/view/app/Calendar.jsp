@@ -5,32 +5,25 @@
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
-<%@ page import="com.ispaces.js.servlet.InitServlet" %>
-
+<%--@ page import="com.ispaces.js.servlet.InitServlet" --%>
 <%!
-    org.apache.logging.log4j.Logger logger;
+    org.apache.logging.log4j.Logger log;
     public void jspInit() { // Create static variables here.
-        logger = org.apache.logging.log4j.LogManager.getLogger();
-        logger.debug("jspInit()");
+        log = org.apache.logging.log4j.LogManager.getLogger();
+        log.debug("jspInit()");
     }
 %>
-
 <%
     String serverUrl = (String)application.getAttribute("serverUrl");
     String contextUrl = (String)application.getAttribute("contextUrl");
     String backendUrl = (String)application.getAttribute("backendUrl");
 %>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-
 <!doctype html>
-
 <html>
-
 <head>
 <title>Ispaces Calendar</title>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
-
 <style type="text/css">
 html,body
 {
@@ -234,15 +227,11 @@ table.month td, table.month td.off
 {
   background:#fff;
 }
-
 </style>
-
 </head>
 <body>
 <script type="text/javascript">
-
 <%
-
     Map<String, String> extraParamsMap = new HashMap<String, String>() {
       {
         put("min", "false");
@@ -251,8 +240,7 @@ table.month td, table.month td.off
         put("log", "true");
       }
     };
-
-    String[] jsClassNames = {
+    String[] classNames = {
         "StandaloneApp"
       , "Constants"
       , "Common"
@@ -274,29 +262,27 @@ table.month td, table.month td.off
       , "WindowControl"
       , "Calendar"
     };
-
-    request.setAttribute("jsClassNames", jsClassNames);
+    request.setAttribute("classNames", classNames);
 %>
 
-(function() {
+window['IspacesApplicationLoader'] = (function() {
 
-    var started=false;
-    var contextUrl='<%= contextUrl %>';
-    var backendUrl='<%= backendUrl %>';
+    var started = false;
+    var contextUrl = '<%= contextUrl %>';
+    var backendUrl = '<%= backendUrl %>';
+    <%--
+    var ispacesUrl = '<%= ispacesUrl %>';
+    --%>
 
 <%
-
     StringBuilder jsUrlBuilder = new StringBuilder();
-
     //jsUrlBuilder.append(contextUrl); // JavaScript URL from same context as ispaces-os.
     jsUrlBuilder.append(serverUrl); // JavaScript URL from same context as ispaces-os.
-
     // Append context path
     //jsUrlBuilder.append("/ispaces");
     //jsUrlBuilder.append("/javapoets");
     //jsUrlBuilder.append("/instagram-api-browser");
     jsUrlBuilder.append("/js"); // js context
-
     // Append servlet path
     jsUrlBuilder.append("/js-comma-separated/"); // js-comma-separated servlet
     //jsUrlBuilder.append("/Constants.js");
@@ -323,40 +309,47 @@ table.month td, table.month td.off
     };
 
     var loadedJs=function() {
-        if(!started) {
-            if(this.readyState) {
-                if(this.readyState=='loaded'){run()}
+        if (!started) {
+            if (this.readyState) {  // fix for IE
+                if (this.readyState == 'loaded') { start() }
             } else {
-                run();
+                start();
             }
         }
     };
+    
 
-    var run = function() {
+    var start = function() {
         //alert('run()');
-
-        started=true;
-
+        started = true;
         var config = {
             'contextUrl': contextUrl
           , 'backendUrl': backendUrl
+          <%--
+          , 'ispacesServletUrl': '<%= ispacesUrlBuilder.toString() %>'
+          //, 'ISPACES_SERVER_URL': '<%= ispacesUrlBuilder.toString() %>'
+          , 'ispacesContextUrl': '<%= ispacesContextUrl %>'
+          , 'classNames': classNames
+          --%>
         };
-
+        //ClassManager.start(config);
         Ispaces.Calendar.start(config);
     };
 
     return {
-
-        startApp: function() {
-          //alert('startApp()');
-
-          include(jsUrl);
+        startApplication: function() {
+            include(ispacesJavascriptUrl);
         }
+        , contextUrl: contextUrl
+        <%--
+        , ispacesServletUrl: '<%= ispacesUrlBuilder.toString() %>'
+        , ispacesContextUrl: '<%= ispacesContextUrl %>'
+        , ISPACES_SERVER_URL: '<%= ispacesUrlBuilder.toString() %>'
+        , classNames: classNames
+        --%>
     }
-
-})().startApp();
-
+})();
+window['IspacesApplicationLoader'].startApplication();
 </script>
-
 </body>
 </html>

@@ -1,4 +1,6 @@
-Ispaces.Calendar = function(config) {
+//Ispaces.Calendar = function(config) {
+//Ispaces['Calendar'] = function(config) {
+Ispaces.Calendar = Ispaces['Calendar'] = function(config) {
     console.log('Ispaces.Calendar('+config+')');
     //alert('Calendar('+config+')');
 
@@ -2855,6 +2857,6 @@ Ispaces.Common.extend(
 
 Ispaces.Calendar['start'] = function(config) {
     Ispaces.logger.debug('Ispaces.Calendar.start('+config+')');
-
-    window['ispacescalendar'] = new Ispaces.Calendar(config);
+    console.log('Ispaces.Calendar.start('+config+')');
+    window['ispacesCalendar'] = new Ispaces.Calendar(config);
 };
