@@ -9,7 +9,8 @@
               "context-path": "/"
             , "webapp-path": "../build/exploded"
             , "virtual-hosts": [
-                "dev.ispaces.com"
+                  "localhost"
+                , "dev.ispaces.com"
             ]
         }
 
@@ -17,7 +18,8 @@
               "context-path": "/js"
             , "webapp-path": "../../../Javapoet/ispaces-javascript-server/build/exploded"
             , "virtual-hosts": [
-                "dev.ispaces.com"
+                  "localhost"
+                , "dev.ispaces.com"
             ]
         }
         
