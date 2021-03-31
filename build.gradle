@@ -122,6 +122,28 @@ task dev(dependsOn: [copyView, copyJavascript]) {
     }
 }
 
+task custombuild {
+    println 'Executing '+project.name+'.custombuild()'
+    doLast {
+        println "$buildName"
+        def buildProperties = new Properties()
+        file("src/main/config/"+buildName+".properties").withInputStream {
+            stream -> buildProperties.load(stream)
+        }
+        println buildProperties.getProperty("protocol") + "://" + buildProperties.getProperty("server") + ":" + buildProperties.getProperty("port") + buildProperties.getProperty("context")
+        def server = buildProperties.getProperty("server")
+        println "server = " + server
+        copy {
+            from 'src/main/config/init.properties'
+            into 'src/main/webapp/WEB-INF'
+            filter(
+                ReplaceTokens
+              , tokens: buildProperties
+            )
+        }
+    }
+}
+
 /*
  * https://discuss.gradle.org/t/how-to-automatically-create-exploded-war-without-invoking-a-seperate-task/4479
  */
