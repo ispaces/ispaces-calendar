@@ -2,11 +2,13 @@
 //Ispaces['Calendar'] = function(config) {
 Ispaces.Calendar = Ispaces['Calendar'] = function(config) {
     console.log('Ispaces.Calendar('+config+')');
-    //alert('Calendar('+config+')');
-
+    let _this = this;
+    Ispaces.Application.apply(_this, arguments); // call the super constructor - Ispaces.Application
     this.configure(config);
     this.init();
 };
+
+Ispaces.Common.extendClass(Ispaces.Calendar, Ispaces.Application);
 
 /*
  * https://stackoverflow.com/questions/22847070/instagram-api-from-client-side
@@ -21,17 +23,12 @@ Ispaces.Calendar = Ispaces['Calendar'] = function(config) {
  */
 
 Ispaces.Common.extend(
-
     Ispaces.Calendar.prototype
-
     , {
-
           classId: 'Calendar'
-    
         , appName: 'Calendar'
-
         , title : 'Calendar'
-
+        , WidthHeight: [400,400]
         //*String*/ , ICON_IMG : Ispaces.Constants.Paths.IMAGES+'test/cal.gif'
         /*Array*/  , MONTHS : ['January','February','March','April','May','June','July','August','September','October','November','December']
         /*Array*/  , MONTHS_ABBR : ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
@@ -91,7 +88,7 @@ Ispaces.Common.extend(
         })()
 
         , configure: function(config) {  // the config object can be passed to this configure the application
-            Ispaces.logger.debug(this.classId+'.configure('+config+')');
+            Ispaces.log.debug(this.classId+'.configure('+config+')');
 
             this.id = new Ispaces.StringBuilder([
                 this.classId
@@ -99,7 +96,7 @@ Ispaces.Common.extend(
               , this.instanceId  // The instanceId gets set in the super class Ispaces.Persistable.
             ]).asString();
 
-            Ispaces.logger.debug('this.id = '+this.id);
+            Ispaces.log.debug('this.id = '+this.id);
 
             if(config) {
                 this.config = config;
@@ -107,8 +104,8 @@ Ispaces.Common.extend(
                 this.backendUrl = config.backendUrl;
                 //this.instagramAccessToken = config.instagramAccessToken;
                 //this.instagramUsername = config.instagramUsername;
-                Ispaces.logger.debug('this.contextUrl = '+this.contextUrl);
-                Ispaces.logger.debug('this.backendUrl = '+this.backendUrl);
+                Ispaces.log.debug('this.contextUrl = '+this.contextUrl);
+                Ispaces.log.debug('this.backendUrl = '+this.backendUrl);
 
                 console.log('this.config.clientId = '+this.config.clientId);
                 console.log('this.config.instagramClientId = '+this.config.instagramClientId);
@@ -124,7 +121,6 @@ Ispaces.Common.extend(
 
         , log: function(x) {
             //console.log('getFacebookFields()');
-
             //this.divMain.add(this.Create.createText(x));
             this.divMain.add(this.Create.createDiv(this.Create.createText(x)));
         }
@@ -134,45 +130,44 @@ Ispaces.Common.extend(
         * This is where the DOM is created and the window is shown.
         */
         , init: function() {
-            //alert(this.id+'.init()');
-            Ispaces.logger.debug(this.id+'.init()');
-
+            Ispaces.log.debug(this.id+'.init()');
+            let _this = this;  // Set a shortcut reference to 'this' for minification performance.
             //this.divApplication = this.createApplication().setClass(this.classId); // Create the application div.
             this.divApplication = this.createApplication(); // Create the application div.
-
             //_this.setDimensions(); // A call to set the dimensions of the window after it has been built and added to the DOM.
+            Ispaces.log.debug(this.id+'.init(): this.divApplication = '+this.divApplication);
+            //Ispaces.log.alert(this.id+'.init(): this.divApplication = '+this.divApplication);
+            _this.resizable = {  // Set the 'resizable' object for this application. @see ResizableHandle & DraggableHandle
+                setWidthPixels: _this.setWidthPixels.bind(_this)
+              , setHeightPixels: _this.setHeightPixels.bind(_this)
+            };
+            var resizableWindow = _this.resizableWindow; // Grab a local reference to this.resizableWindow.
+            resizableWindow.addResizables(); //  Add the resizable handles to the resizable window.
+            resizableWindow.addApplication(); // Add the application to the resizable window.
+            resizableWindow.hide(); // Hide the application before appending it to the DOM.
 
-            Ispaces.logger.debug(this.id+'.init(): this.divApplication = '+this.divApplication);
-            //Ispaces.logger.alert(this.id+'.init(): this.divApplication = '+this.divApplication);
-
-            body.add(this.divApplication);
+            //body.add(this.divApplication);
+            this.launch(); // Launch the application by appending it to the DOM.
 
             //this.populateData();
-
             this.monthDiv = this.createMonthCalendar();
             this.divMain.add(this.monthDiv);
-
             this.refreshMonth();
-
             //_this.setDimensions(); // A call to set the dimensions of the window after it has been built and added to the DOM.
         }
 
-
         , setDimensions: function() {
-            Ispaces.logger.debug(this.id+'.setDimensions()');
-            //alert(this.id+'.setDimensions()');
-
+            Ispaces.log.debug(this.id+'.setDimensions()');
             var windowWidth = window.innerWidth;
-            Ispaces.logger.debug('windowWidth = '+windowWidth);
-            //Ispaces.logger.alert('windowWidth = '+windowWidth);
-
+            Ispaces.log.debug('windowWidth = '+windowWidth);
+            //Ispaces.log.alert('windowWidth = '+windowWidth);
             var windowHeight = window.innerHeight;
-            Ispaces.logger.debug('windowHeight = '+windowHeight);
+            Ispaces.log.debug('windowHeight = '+windowHeight);
             //alert('windowHeight = '+windowHeight);
         }
 
         , createApplication: function() {
-            //alert('createApplication()');
+            Ispaces.log.debug(this.classId+'.createApplication()');
 
             var Create = this.Create
             , createDiv = Create.createDiv
@@ -185,9 +180,7 @@ Ispaces.Common.extend(
 
             //var divMain=this.createMain();
 
-            Ispaces.logger.debug(this.classId+'.createApplication('+id+')');
-
-            var _this=this
+            var _this = this
             , Create = this.Create
             , createDivCell = Create.createDivCell
             , createDivRow = Create.createDivRow
@@ -199,23 +192,22 @@ Ispaces.Common.extend(
              * Order is especially important here, in that the DraggableApplication required the reference to 'this.resizableWindow' to be set.
              */
             var resizableWindow = this.resizableWindow = new Ispaces.ResizableWindow(this); // DraggableApplication requires this.resizableWindow
-            var titlebar=resizableWindow.createTitlebar();  // Some applications might not want the titlebar. Leave it up to the application to decide if it wants to create one.
-            
-            //new Ispaces.DraggableApplication(_this,titlebar);
+            var titlebar = resizableWindow.createTitlebar();  // Some applications might not want the titlebar. Leave it up to the application to decide if it wants to create one.
+            new Ispaces.DraggableApplication(_this, titlebar);
 
-            var cellTitlebar=createDivCell(titlebar)
-            ,rowTitlebar=createDivRow(cellTitlebar)
+            var cellTitlebar = createDivCell(titlebar)
+            , rowTitlebar = createDivRow(cellTitlebar)
             ;
 
-  //resizableWindow.setTitlebarHeight(33);
-  //resizableWindow.titlebar.bo(0);
-  //resizableWindow.titlebar.ba('transparent');
+            //resizableWindow.setTitlebarHeight(33);
+            //resizableWindow.titlebar.bo(0);
+            //resizableWindow.titlebar.ba('transparent');
 
             this.menu = this.createMenu();
 
             var divMain = this.divMain = this.createMain()
             , cellMain = createDivCell(divMain).setClass("cell-main")
-            , rowMain = createDivRow(cellMain)
+            , rowMain = createDivRow(cellMain);
 
             divMain.setHeightPercent(100);
             cellMain.setHeightPercent(100);
@@ -229,7 +221,7 @@ Ispaces.Common.extend(
             ;
             */
 
-    //this.divApplication.addAll([this.menu,this.divMain]);
+            //this.divApplication.addAll([this.menu,this.divMain]);
 
             var divTable = this.divTable = Create.createDivTable([
                 rowTitlebar
@@ -238,7 +230,7 @@ Ispaces.Common.extend(
               //, rowBottom
             ]);
 
-    //this.divApplication.wihi(this.windowWidth,this.windowHeight);
+            //this.divApplication.wihi(this.windowWidth,this.windowHeight);
 
             /*
              * Style
@@ -278,21 +270,18 @@ Ispaces.Common.extend(
         }
 
 
-        , createMain : function() {
-
-            Ispaces.logger.debug(this.classId+'.createMain()');
-
+        , createMain: function() {
+            Ispaces.log.debug(this.classId+'.createMain()');
             //var main=this.Create.createElement(Ispaces.Constants.ElementNames.DIV);
             //var main=this.Create.createElement(Ispaces.Constants.ElementNames.DIV);
             var main=this.Create.createDiv();
             //main.wihi(this.windowWidth,this.apHeight);
             //main.miWi(222);
-            
             return main;
         }
 
-        , createMenu : function() {
-            Ispaces.logger.debug('createMenu()');
+        , createMenu: function() {
+            Ispaces.log.debug('createMenu()');
             
             var _this=this; // Create a closure on this
             var cN='buttons';
@@ -825,7 +814,7 @@ Ispaces.Common.extend(
         */
 
         , clickButtonLogout: function(button, e) {
-            Ispaces.logger.debug(this.id+'.clickButtonLogout(button:'+button+', e:'+e+')');
+            Ispaces.log.debug(this.id+'.clickButtonLogout(button:'+button+', e:'+e+')');
             console.log(this.id+'.clickButtonLogout(button:'+button+', e:'+e+')');
 
             var logoutUrl = new Ispaces.StringBuilder()
@@ -839,7 +828,7 @@ Ispaces.Common.extend(
         }
 
         , mouseDownButtonAuthenticate: function(button, e) {
-            Ispaces.logger.debug(this.id+'.mouseDownButtonAuthenticate(button:'+button+', e:'+e+')');
+            Ispaces.log.debug(this.id+'.mouseDownButtonAuthenticate(button:'+button+', e:'+e+')');
             console.log(this.id+'.mouseDownButtonAuthenticate(button:'+button+', e:'+e+')');
 
             var redirectUri = new Ispaces.StringBuilder()
@@ -866,309 +855,285 @@ Ispaces.Common.extend(
             window.location.href = location;
         }
 
-        , populateData : function() {
-    Ispaces.logger.debug(this.classId+'.populateData()');
-    this.checkLocalStorage(this.entriesName);
-    //this.showEntries();
-    //this.removeEntries();
+        , populateData: function() {
+            Ispaces.log.debug(this.classId+'.populateData()');
+            this.checkLocalStorage(this.entriesName);
+            //this.showEntries();
+            //this.removeEntries();
         }
 
-        , populateYearMonthDay : function(date) {
-            Ispaces.logger.debug(this.classId+'.populateYearMonthDay('+date+')');
-            Ispaces.logger.alert(this.classId+'.populateYearMonthDay('+date+')');
-
-            this.year=(date||this.now).getFullYear();
-            this.month=(date||this.now).getMonth();
-            this.weekday=(date||this.now).getDay();
-            this.date=(date||this.now).getDate();
-
-            /*
-            */
-            Ispaces.logger.debug('this.year = '+this.year);
-            Ispaces.logger.debug('this.month = '+this.month);
-            Ispaces.logger.debug('this.weekday = '+this.weekday);
-            Ispaces.logger.debug('this.date = '+this.date);
-
+        , populateYearMonthDay: function(date) {
+            Ispaces.log.debug(this.classId+'.populateYearMonthDay(date:'+date+')');
+            this.year = (date||this.now).getFullYear();
+            this.month = (date||this.now).getMonth();
+            this.weekday = (date||this.now).getDay();
+            this.date = (date||this.now).getDate();
+            Ispaces.log.debug('this.year = '+this.year);
+            Ispaces.log.debug('this.month = '+this.month);
+            Ispaces.log.debug('this.weekday = '+this.weekday);
+            Ispaces.log.debug('this.date = '+this.date);
             this.dateSelected=this.date;
             this.monthSelected=this.month;
-
         }
 
         , checkRemoteStorage:function(id){
-            Ispaces.logger.debug(this.classId+'.checkRemoteStorage('+id+')');
+            Ispaces.log.debug(this.classId+'.checkRemoteStorage('+id+')');
         }
 
         , checkLocalStorage:function(id){
-            Ispaces.logger.debug(this.classId+'.checkLocalStorage('+id+')');
-    /*
-    var _this=this;
-    //this.store.get(id,function(ok, val) {
-    this.store.get(id,function(ok,val){
-      if(ok&&val){
-        Ispaces.logger.alert(_this.classId+'.checkLocalStorage('+id+'): val = ' + val);
-        this.entries=val;
-        Ispaces.logger.alert(_this.classId+'.checkLocalStorage('+id+'): this.entries = ' + this.entries);
-      }
-    },this);
-    */
-    //this.store.get(id,this.setEntries,this);
+            Ispaces.log.debug(this.classId+'.checkLocalStorage('+id+')');
+            /*
+            var _this=this;
+            //this.store.get(id,function(ok, val) {
+            this.store.get(id,function(ok,val){
+            if(ok&&val){
+                Ispaces.log.alert(_this.classId+'.checkLocalStorage('+id+'): val = ' + val);
+                this.entries=val;
+                Ispaces.log.alert(_this.classId+'.checkLocalStorage('+id+'): this.entries = ' + this.entries);
+            }
+        },this);
+        */
+        //this.store.get(id,this.setEntries,this);
         }
 
         , setDayWeekMonth : function(ok,val) {
-            Ispaces.logger.alert(this.classId+'.setDayWeekMonth('+ok+','+val+')');
-            if(ok&&val){
-                Ispaces.logger.debug(this.classId+'.setDayWeekMonth('+ok+','+val+'): val = ' + val);
-                Ispaces.logger.debug(this.classId+'.setDayWeekMonth('+ok+','+val+'): typeof val = ' + typeof val);
-      //Ispaces.logger.debug(this.classId+'.setDayWeekMonth('+ok+','+val+'): Common.parens(val) = ' + Common.parens(val));
-      //this.dayWeekMonth=eval(Common.parens(val));
+            Ispaces.log.alert(this.classId+'.setDayWeekMonth('+ok+','+val+')');
+            if (ok && val) {
+                Ispaces.log.debug(this.classId+'.setDayWeekMonth('+ok+','+val+'): val = ' + val);
+                Ispaces.log.debug(this.classId+'.setDayWeekMonth('+ok+','+val+'): typeof val = ' + typeof val);
+                //Ispaces.log.debug(this.classId+'.setDayWeekMonth('+ok+','+val+'): Common.parens(val) = ' + Common.parens(val));
+                //this.dayWeekMonth=eval(Common.parens(val));
                 eval(Ispaces.Common.parens(val));
-      /*
-      if(val=='month'){
-        Ispaces.logger.alert(this.classId+'.setDayWeekMonth('+ok+','+val+'): this.showMonth()');
-        this.showMonth();
-      }else if(val=='week'){
-        Ispaces.logger.alert(this.classId+'.setDayWeekMonth('+ok+','+val+'): this.showWeek()');
-        this.showWeek();
-      }
-      */
-            }else{
-                Ispaces.logger.debug(this.classId+'.setDayWeekMonth('+ok+','+val+'): No '+this.classId+' dayWeekMonth entry found.');
+              /*
+              if(val=='month'){
+                Ispaces.log.alert(this.classId+'.setDayWeekMonth('+ok+','+val+'): this.showMonth()');
+                this.showMonth();
+              }else if(val=='week'){
+                Ispaces.log.alert(this.classId+'.setDayWeekMonth('+ok+','+val+'): this.showWeek()');
+                this.showWeek();
+              }
+              */
+            } else {
+                Ispaces.log.debug(this.classId+'.setDayWeekMonth('+ok+','+val+'): No '+this.classId+' dayWeekMonth entry found.');
                 this.showMonth();
             }
         }
 
         , setEntries : function(ok,val) {
-    Ispaces.logger.alert(this.classId+'.setEntries('+ok+','+val+')');
-    if(ok&&val){
-      Ispaces.logger.debug(this.classId+'.setEntries('+ok+','+val+'): val = ' + val);
-      Ispaces.logger.debug(this.classId+'.setEntries('+ok+','+val+'): typeof val = ' + typeof val);
-      //this.entries=val;
-      this.entries=eval(Ispaces.Common.parens(val));
-      Ispaces.logger.debug(this.classId+'.setEntries('+ok+','+val+'): this.entries = ' + this.entries);
-      Ispaces.logger.debug(this.classId+'.setEntries('+ok+','+val+'): typeof this.entries = ' + typeof this.entries);
-      Ispaces.logger.debug(this.classId+'.setEntries('+ok+','+val+'): this.entries.length = ' + this.entries.length);
-    }else{
-      Ispaces.logger.debug(this.classId+'.setEntries('+ok+','+val+'): No '+this.classId+' entries found.');
-    }
+            Ispaces.log.alert(this.classId+'.setEntries('+ok+','+val+')');
+            if(ok&&val){
+              Ispaces.log.debug(this.classId+'.setEntries('+ok+','+val+'): val = ' + val);
+              Ispaces.log.debug(this.classId+'.setEntries('+ok+','+val+'): typeof val = ' + typeof val);
+              //this.entries=val;
+              this.entries=eval(Ispaces.Common.parens(val));
+              Ispaces.log.debug(this.classId+'.setEntries('+ok+','+val+'): this.entries = ' + this.entries);
+              Ispaces.log.debug(this.classId+'.setEntries('+ok+','+val+'): typeof this.entries = ' + typeof this.entries);
+              Ispaces.log.debug(this.classId+'.setEntries('+ok+','+val+'): this.entries.length = ' + this.entries.length);
+            }else{
+              Ispaces.log.debug(this.classId+'.setEntries('+ok+','+val+'): No '+this.classId+' entries found.');
+            }
         }
 
-        , nextYear : function() {
-            Ispaces.logger.alert(this.classId+'.nextYear()');
-
+        , nextYear: function() {
+            Ispaces.log.debug(this.classId+'.nextYear()');
             this.setYear(this.year+1);
             this.refreshMonth();
         }
 
-        , prevYear : function() {
-            Ispaces.logger.alert(this.classId+'.prevYear()');
-
+        , prevYear: function() {
+            Ispaces.log.debug(this.classId+'.prevYear()');
             this.setYear(this.year-1);
             this.refreshMonth();
         }
 
-        , setYear:function(year){
-            Ispaces.logger.alert(this.classId+'.setYear('+year+')');
+        , setYear: function(year) {
+            Ispaces.log.debug(this.classId+'.setYear('+year+')');
             this.year=year;
             this.divYear.replaceFirst(this.Create.createText(this.year));
         }
 
-        , prevMonth:function(){
-            Ispaces.logger.alert(this.classId+'.prevMonth()');
+        , prevMonth: function() {
+            Ispaces.log.debug(this.classId+'.prevMonth()');
             this.setMonth(this.month-1);
             this.divMonth.replaceFirst(this.Create.createText(this.getMnth(this.month)))
         }
 
-        , nextMonth : function() {
-            Ispaces.logger.alert(this.classId+'.nextMonth()');
-
-    this.setMonth(this.month+1);
-    this.divMonth.replaceFirst(this.Create.createText(this.getMnth(this.month)))
+        , nextMonth: function() {
+            Ispaces.log.debug(this.classId+'.nextMonth()');
+            this.setMonth(this.month+1);
+            this.divMonth.replaceFirst(this.Create.createText(this.getMnth(this.month)))
         }
 
-        , setMonth : function(month) {
-            Ispaces.logger.alert(this.classId+'.setMonth('+month+')');
-
-            if(month<0){
-                month=11;
+        , setMonth: function(month) {
+            Ispaces.log.debug(this.classId+'.setMonth('+month+')');
+            if (month < 0) {
+                month = 11;
                 this.year--;
                 this.divYear.replaceFirst(this.Create.createText(this.year));
-            }else if(month>11){
-                month=0;
+            } else if (month>11) {
+                month = 0;
                 this.year++;
                 this.divYear.replaceFirst(this.Create.createText(this.year));
             }
             this.month=month;
-
             this.divMonth.replaceFirst(this.Create.createText(this.getMnth(this.month)));
             this.refreshMonth();
         }
 
-        , getMnth : function(month) { return this.MONTHS[(month?month:this.month)]}
+        , getMnth: function(month) { return this.MONTHS[(month ? month : this.month)] }
 
-        , getMnthPrev:function(month){
-    if(month==0){
-      return 11;
-    }
-    return month;
+        , getMnthPrev: function(month) {
+            if(month==0){
+              return 11;
+            }
+            return month;
         }
 
-        , setDayOfMonth : function(dayOfMonth) {
-    this.dayOfMonth=dayOfMonth;
+        , setDayOfMonth: function(dayOfMonth) {
+            this.dayOfMonth=dayOfMonth;
         }
 
-        , prevWeek : function() {
-            Ispaces.logger.alert(this.classId+'.prevWeek()');
-
-    var daysInMonth=this.getDaysInMonth();
-    Ispaces.logger.debug(this.classId+'.prevWeek(): daysInMonth = '+daysInMonth);
-
-    if(!this.weekStartDate){
-      this.weekStartDate=this.getWeekStartDate();
-    }
-
-    this.weekStartDate-=this.daysInWeek;
-    Ispaces.logger.debug(this.classId+'.prevWeek(): this.weekStartDate = '+this.weekStartDate);
-
-    if(this.weekStartDate<=0){
-      this.setMonth(this.month-1);
-      daysInMonth=this.getDaysInMonth();
-      this.weekStartDate=(this.weekStartDate+daysInMonth); // add the zero count
-      Ispaces.logger.debug(this.classId+'.prevWeek(): this.weekStartDate = '+this.weekStartDate);
-      this.divMonth.replaceFirst(this.Create.createText(this.getMnth()))
-    }
-    this.divWeek.replaceFirst(this.Create.createText(this.getWeek(this.month,this.weekStartDate)));
+        , prevWeek: function() {
+            Ispaces.log.debug(this.classId+'.prevWeek()');
+            var daysInMonth = this.getDaysInMonth();
+            Ispaces.log.debug(this.classId+'.prevWeek(): daysInMonth = '+daysInMonth);
+            if (!this.weekStartDate) {
+              this.weekStartDate=this.getWeekStartDate();
+            }
+            this.weekStartDate-=this.daysInWeek;
+            Ispaces.log.debug(this.classId+'.prevWeek(): this.weekStartDate = '+this.weekStartDate);
+            if (this.weekStartDate <= 0) {
+              this.setMonth(this.month-1);
+              daysInMonth=this.getDaysInMonth();
+              this.weekStartDate=(this.weekStartDate+daysInMonth); // add the zero count
+              Ispaces.log.debug(this.classId+'.prevWeek(): this.weekStartDate = '+this.weekStartDate);
+              this.divMonth.replaceFirst(this.Create.createText(this.getMnth()))
+            }
+            this.divWeek.replaceFirst(this.Create.createText(this.getWeek(this.month,this.weekStartDate)));
         }
 
-        , nextWeek:function(){
-            Ispaces.logger.alert(this.classId+'.nextWeek()');
+        , nextWeek: function() {
+            Ispaces.log.debug(this.classId+'.nextWeek()');
+            //Ispaces.log.debug(this.classId+'.nextWeek(): this.dayOfMonth = '+this.dayOfMonth);
+            //Ispaces.log.debug(this.classId+'.nextWeek(): this.date = '+this.date);
+            var daysInMonth = this.getDaysInMonth();
+            Ispaces.log.debug(this.classId+'.nextWeek(): daysInMonth = '+daysInMonth);
+            if (!this.weekStartDate) {
+              this.weekStartDate=this.getWeekStartDate();
+            }
+            /*
+            this.date+=this.daysInWeek;
+            Ispaces.log.debug(this.classId+'.nextWeek(): this.date = '+this.date);
+            */
+            this.weekStartDate+=this.daysInWeek;
+            Ispaces.log.debug(this.classId+'.nextWeek(): this.weekStartDate = '+this.weekStartDate);
 
-    //Ispaces.logger.debug(this.classId+'.nextWeek(): this.dayOfMonth = '+this.dayOfMonth);
-    //Ispaces.logger.debug(this.classId+'.nextWeek(): this.date = '+this.date);
+            //if(this.date>daysInMonth){
+            if(this.weekStartDate>daysInMonth){
 
-    var daysInMonth=this.getDaysInMonth();
-    Ispaces.logger.debug(this.classId+'.nextWeek(): daysInMonth = '+daysInMonth);
+              /*
+              this.date=this.date-daysInMonth;
+              Ispaces.log.debug(this.classId+'.nextWeek(): this.date = '+this.date);
+              */
+              this.weekStartDate=this.weekStartDate-daysInMonth;
+              Ispaces.log.debug(this.classId+'.nextWeek(): this.weekStartDate = '+this.weekStartDate);
 
-    if(!this.weekStartDate){
-      this.weekStartDate=this.getWeekStartDate();
-    }
-
-    /*
-    this.date+=this.daysInWeek;
-    Ispaces.logger.debug(this.classId+'.nextWeek(): this.date = '+this.date);
-    */
-    this.weekStartDate+=this.daysInWeek;
-    Ispaces.logger.debug(this.classId+'.nextWeek(): this.weekStartDate = '+this.weekStartDate);
-
-    //if(this.date>daysInMonth){
-    if(this.weekStartDate>daysInMonth){
-
-      /*
-      this.date=this.date-daysInMonth;
-      Ispaces.logger.debug(this.classId+'.nextWeek(): this.date = '+this.date);
-      */
-      this.weekStartDate=this.weekStartDate-daysInMonth;
-      Ispaces.logger.debug(this.classId+'.nextWeek(): this.weekStartDate = '+this.weekStartDate);
-
-      this.setMonth(this.month+1);
-      //this.divMonth.replaceFirst(this.Create.createText(this.getMnth(this.month)))
-      this.divMonth.replaceFirst(this.Create.createText(this.getMnth()))
-    }
-    //this.divWeek.replaceFirst(this.Create.createText(this.getWeek(null,this.weekStartDate)));
-    this.divWeek.replaceFirst(this.Create.createText(this.getWeek(this.month,this.weekStartDate)));
-
-    this.refreshWeek(this.weekStartDate);
-
+              this.setMonth(this.month+1);
+              //this.divMonth.replaceFirst(this.Create.createText(this.getMnth(this.month)))
+              this.divMonth.replaceFirst(this.Create.createText(this.getMnth()))
+            }
+            //this.divWeek.replaceFirst(this.Create.createText(this.getWeek(null,this.weekStartDate)));
+            this.divWeek.replaceFirst(this.Create.createText(this.getWeek(this.month,this.weekStartDate)));
+            this.refreshWeek(this.weekStartDate);
         }
 
         , getWeekStartDate : function() {
-            Ispaces.logger.debug(this.classId+'.getWeekStartDate()');
-    Ispaces.logger.debug(this.classId+'.getWeekStartDate(): this.date = '+this.date);
-    Ispaces.logger.debug(this.classId+'.getWeekStartDate(): this.weekday = '+this.weekday);
-    var weekStartDate=this.date-this.weekday;
-    if(weekStartDate<=0){
-      //this.setMonth(this.month-1);
-      //var daysInMonthPrev=this.getDaysInMonth();
-      var daysInMonthPrev=this.getDaysInMonth(this.month-1);
-      weekStartDate=daysInMonthPrev+weekStartDate;
-    }
-    return weekStartDate;
+            Ispaces.log.debug(this.classId+'.getWeekStartDate()');
+            Ispaces.log.debug(this.classId+'.getWeekStartDate(): this.date = '+this.date);
+            Ispaces.log.debug(this.classId+'.getWeekStartDate(): this.weekday = '+this.weekday);
+            var weekStartDate=this.date-this.weekday;
+            if(weekStartDate<=0){
+              //this.setMonth(this.month-1);
+              //var daysInMonthPrev=this.getDaysInMonth();
+              var daysInMonthPrev=this.getDaysInMonth(this.month-1);
+              weekStartDate=daysInMonthPrev+weekStartDate;
+            }
+            return weekStartDate;
         }
 
         , getWeek : function(month, weekStartDate) {
-            Ispaces.logger.debug(this.classId+'.getWeek()');
-    var sb=new Ispaces.StringBuilder();
-    //var month=this.MONTHS[(month?month:this.month)];
-    var monthAbbr=this.MONTHS_ABBR[(month?month:this.month)];
-    var daysInMonth=this.getDaysInMonth();
-    sb.append(monthAbbr);
-    sb.append(Ispaces.Constants.Characters.SPACE);
+            Ispaces.log.debug(this.classId+'.getWeek()');
+            var sb=new Ispaces.StringBuilder();
+            //var month=this.MONTHS[(month?month:this.month)];
+            var monthAbbr=this.MONTHS_ABBR[(month?month:this.month)];
+            var daysInMonth=this.getDaysInMonth();
+            sb.append(monthAbbr);
+            sb.append(Ispaces.Constants.Characters.SPACE);
 
-    if(!weekStartDate){
-      Ispaces.logger.debug(this.classId+'.getWeek(): this.weekday = '+this.weekday);
-      weekStartDate=this.getWeekStartDate();
-    }
-    /*
-    var weekStartDate=this.date-this.weekday;
-    if(weekStartDate<=0){
-      this.setMonth(this.month-1);
-      var daysInMonthPrev=this.getDaysInMonth();
-      weekStartDate=daysInMonthPrev+weekStartDate;
-    }
-    */
+            if(!weekStartDate){
+              Ispaces.log.debug(this.classId+'.getWeek(): this.weekday = '+this.weekday);
+              weekStartDate=this.getWeekStartDate();
+            }
+            /*
+            var weekStartDate=this.date-this.weekday;
+            if(weekStartDate<=0){
+              this.setMonth(this.month-1);
+              var daysInMonthPrev=this.getDaysInMonth();
+              weekStartDate=daysInMonthPrev+weekStartDate;
+            }
+            */
 
-    Ispaces.logger.debug(this.classId+'.getWeek(): weekStartDate = '+weekStartDate);
-    sb.append(weekStartDate);
-    sb.append(' - ');
-    //sb.append(Ispaces.Constants.Characters.SPACE);sb.append(hyphen);sb.append(Ispaces.Constants.Characters.SPACE);
-    //sb.append(Ispaces.Constants.Characters.SPACE);sb.append(urlhyphen);sb.append(Ispaces.Constants.Characters.SPACE);
+            Ispaces.log.debug(this.classId+'.getWeek(): weekStartDate = '+weekStartDate);
+            sb.append(weekStartDate);
+            sb.append(' - ');
+            //sb.append(Ispaces.Constants.Characters.SPACE);sb.append(hyphen);sb.append(Ispaces.Constants.Characters.SPACE);
+            //sb.append(Ispaces.Constants.Characters.SPACE);sb.append(urlhyphen);sb.append(Ispaces.Constants.Characters.SPACE);
 
-    var weekEndDate=weekStartDate+(this.daysInWeek-1);
-    if(weekEndDate>daysInMonth){
-      weekEndDate=weekEndDate-daysInMonth;
-      var monthNextAbbr=this.MONTHS_ABBR[(month?month+1:this.month+1)];
-      Ispaces.logger.debug(this.classId+'.getWeek(): monthNextAbbr = '+monthNextAbbr);
-      sb.append(monthNextAbbr);
-      sb.append(Ispaces.Constants.Characters.SPACE);
-    }
-    Ispaces.logger.debug(this.classId+'.getWeek(): weekEndDate = '+weekEndDate);
+            var weekEndDate=weekStartDate+(this.daysInWeek-1);
+            if(weekEndDate>daysInMonth){
+              weekEndDate=weekEndDate-daysInMonth;
+              var monthNextAbbr=this.MONTHS_ABBR[(month?month+1:this.month+1)];
+              Ispaces.log.debug(this.classId+'.getWeek(): monthNextAbbr = '+monthNextAbbr);
+              sb.append(monthNextAbbr);
+              sb.append(Ispaces.Constants.Characters.SPACE);
+            }
+            Ispaces.log.debug(this.classId+'.getWeek(): weekEndDate = '+weekEndDate);
 
-    sb.append(weekEndDate);
-    Ispaces.logger.debug(this.classId+'.getWeek(): sb.asString() = '+sb.asString());
-    return sb.asString();
-
+            sb.append(weekEndDate);
+            Ispaces.log.debug(this.classId+'.getWeek(): sb.asString() = '+sb.asString());
+            return sb.asString();
         }
 
         , nextDay : function() {
-    Ispaces.logger.alert(this.classId+'.nextDay()');
-    this.dayOfMonth++;
-    var daysInMonth=this.getDaysInMonth();
-    if(this.dayOfMonth>daysInMonth){
-      this.dayOfMonth=1;
-      this.setMonth(this.month+1);
-      this.divMonth.replaceFirst(this.Create.createText(this.getMnth(this.month)))
-    }
-    Ispaces.logger.debug(this.classId+'.nextDay(): this.dayOfMonth = '+this.dayOfMonth);
-    var dayOfWeek=this.getDayOfWeek(daysInMonth);
-    Ispaces.logger.debug(this.classId+'.nextDay(): dayOfWeek = '+dayOfWeek);
+            Ispaces.log.debug(this.classId+'.nextDay()');
+            this.dayOfMonth++;
+            var daysInMonth = this.getDaysInMonth();
+            if (this.dayOfMonth > daysInMonth) {
+                this.dayOfMonth = 1;
+                this.setMonth(this.month + 1);
+                this.divMonth.replaceFirst(this.Create.createText(this.getMnth(this.month)))
+            }
+            Ispaces.log.debug(this.classId+'.nextDay(): this.dayOfMonth = '+this.dayOfMonth);
+            var dayOfWeek = this.getDayOfWeek(daysInMonth);
+            Ispaces.log.debug(this.classId+'.nextDay(): dayOfWeek = '+dayOfWeek);
         }
 
-        , prevDay : function() {
-            Ispaces.logger.alert(this.classId+'.prevDay()');
-    this.dayOfMonth--;
-    if(this.dayOfMonth==0){
-      this.setMonth(this.month-1);
-      var daysInMonth=this.getDaysInMonth();
-      this.dayOfMonth=daysInMonth;
-      this.divMonth.replaceFirst(this.Create.createText(this.getMnth(this.month)))
-    }
-    Ispaces.logger.debug(this.classId+'.nextDay(): this.dayOfMonth = '+this.dayOfMonth);
-    var dayOfWeek=this.getDayOfWeek(daysInMonth);
-    Ispaces.logger.debug(this.classId+'.nextDay(): dayOfWeek = '+dayOfWeek);
+        , prevDay: function() {
+            Ispaces.log.debug(this.classId+'.prevDay()');
+            this.dayOfMonth--;
+            if (this.dayOfMonth == 0) {
+              this.setMonth(this.month-1);
+              var daysInMonth = this.getDaysInMonth();
+              this.dayOfMonth = daysInMonth;
+              this.divMonth.replaceFirst(this.Create.createText(this.getMnth(this.month)))
+            }
+            Ispaces.log.debug(this.classId+'.nextDay(): this.dayOfMonth = '+this.dayOfMonth);
+            var dayOfWeek = this.getDayOfWeek(daysInMonth);
+            Ispaces.log.debug(this.classId+'.nextDay(): dayOfWeek = '+dayOfWeek);
         }
 
-        , getDayOfWeek : function(daysInMonth) {
-
-            Ispaces.logger.debug(this.classId+'.getDayOfWeek()');
+        , getDayOfWeek: function(daysInMonth) {
+            Ispaces.log.debug(this.classId+'.getDayOfWeek()');
 
             if(!daysInMonth)daysInMonth=this.getDaysInMonth();
             var dayOfMonthCount=0;
@@ -1176,16 +1141,16 @@ Ispaces.Common.extend(
             var daysCount=0;
             var rows=1;
             var daysInRowOne=this.daysInWeek-this.monthWeekday;
-            Ispaces.logger.debug(this.classId+'.getDayOfWeek(): daysInRowOne = '+daysInRowOne);
+            Ispaces.log.debug(this.classId+'.getDayOfWeek(): daysInRowOne = '+daysInRowOne);
             daysCount+=daysInRowOne;
-            Ispaces.logger.debug(this.classId+'.getDayOfWeek(): daysCount = '+daysCount);
+            Ispaces.log.debug(this.classId+'.getDayOfWeek(): daysCount = '+daysCount);
             while(daysCount<daysInMonth){
               daysCount+=this.daysInWeek;
-              Ispaces.logger.debug(this.classId+'.getDayOfWeek(): daysCount = '+daysCount);
+              Ispaces.log.debug(this.classId+'.getDayOfWeek(): daysCount = '+daysCount);
               rows++;
-              Ispaces.logger.debug(this.classId+'.v(): rows = '+rows);
+              Ispaces.log.debug(this.classId+'.v(): rows = '+rows);
             }
-            Ispaces.logger.debug(this.classId+'.getDayOfWeek(): rows = '+rows);
+            Ispaces.log.debug(this.classId+'.getDayOfWeek(): rows = '+rows);
 
             for(var i=0;i<rows;i++){
               for(var j=0;j<cols;j++){
@@ -1204,8 +1169,8 @@ Ispaces.Common.extend(
             return Ispaces.Constants.Characters.EMPTY;
         }
 
-        , today : function() {
-            Ispaces.logger.alert(this.classId+'.today()');
+        , today: function() {
+            Ispaces.log.alert(this.classId+'.today()');
 
             this.populateYearMonthDay(new Date());
             //this.setDay(this.day);
@@ -1214,8 +1179,8 @@ Ispaces.Common.extend(
             //this.store.get('calls',this.setDayWeekMonth,this); // get the button to select
         }
 
-        , setDay : function(day) {
-            Ispaces.logger.alert(this.classId+'.setDay('+day+')');
+        , setDay: function(day) {
+            Ispaces.log.alert(this.classId+'.setDay('+day+')');
 
             this.dayOfMonth=day;
             var month=0;
@@ -1235,7 +1200,7 @@ Ispaces.Common.extend(
 
 /*
   nextDay:function(){
-    Ispaces.logger.debug(this.classId+'.nextDay()');
+    Ispaces.log.debug(this.classId+'.nextDay()');
     this.dayOfMonth++;
     var daysInMonth=this.getDaysInMonth();
     if(this.dayOfMonth>daysInMonth){
@@ -1243,164 +1208,152 @@ Ispaces.Common.extend(
       this.setMonth(this.month+1);
       this.divMonth.replaceFirst(this.Create.createText(this.getMnth(this.month)))
     }
-    Ispaces.logger.debug(this.classId+'.nextDay(): this.dayOfMonth = '+this.dayOfMonth);
+    Ispaces.log.debug(this.classId+'.nextDay(): this.dayOfMonth = '+this.dayOfMonth);
     var dayOfWeek=this.getDayOfWeek(daysInMonth);
-    Ispaces.logger.debug(this.classId+'.nextDay(): dayOfWeek = '+dayOfWeek);
+    Ispaces.log.debug(this.classId+'.nextDay(): dayOfWeek = '+dayOfWeek);
   },
 */
 
-        , getNextHour : function(hour) {
-
-            if(hour==12) {
+        , getNextHour: function(hour) {
+            if (hour == 12) {
                 hour=0;
             }
-
             hour++;
             return hour;
         }
 
-        , showMonth : function() {
-            Ispaces.logger.alert(this.classId+'.showMonth()');
-
-            if(!this.monthTable){
+        , showMonth: function() {
+            Ispaces.log.debug(this.classId+'.showMonth()');
+            if (!this.monthTable) {
                 this.createMonthCalendar();
             }
-
             //this.store.set('calls',"this.showMonth()");
             //this.store.set('calls','month');
-
             this.weekSelector.hide();
             this.daySelector.hide();
             this.monthSelector.show();
-            if(this.weekDiv)this.weekDiv.hide();
+            if (this.weekDiv) this.weekDiv.hide();
             this.monthDiv.show();
             this.buttonMonth.setClass('positive-notop');
             this.buttonWeek.setClass('positive-notop-on');
             this.buttonDay.setClass('positive-notop-on');
-
             this.refreshMonth();
         }
 
-        , showWeek : function() {
-            Ispaces.logger.alert(this.classId+'.showWeek()');
-    //this.store.set('calls',"this.showWeek()");
-    //this.store.set('calls','week');
+        , showWeek: function() {
+            Ispaces.log.debug(this.classId+'.showWeek()');
+            //this.store.set('calls',"this.showWeek()");
+            //this.store.set('calls','week');
 
-/*
-    if(!this.showingDay){ // if we click the week button a second time, show the day
-      this.showDay();
-      return;
-    }
-*/
+        /*
+            if(!this.showingDay){ // if we click the week button a second time, show the day
+              this.showDay();
+              return;
+            }
+        */
 
-    if(!this.weekHeaderTable){
-      this.createWeekCalendar();
-    }
+            if (!this.weekHeaderTable) {
+              this.createWeekCalendar();
+            }
 
-    if(this.monthDiv)this.monthDiv.hide();
-    this.monthSelector.hide();
-    this.daySelector.hide();
-    this.weekSelector.show();
-    this.buttonMonth.setClass('positive-notop-on');
-    this.buttonDay.setClass('positive-notop-on');
-    this.buttonWeek.setClass('positive-notop');
+            if (this.monthDiv) this.monthDiv.hide();
+            this.monthSelector.hide();
+            this.daySelector.hide();
+            this.weekSelector.show();
+            this.buttonMonth.setClass('positive-notop-on');
+            this.buttonDay.setClass('positive-notop-on');
+            this.buttonWeek.setClass('positive-notop');
 
-    if(this.showingDay){
-      var cols=this.weekHeaderTds.length;
-      for(var i=0;i<cols;i++){
-        this.weekHeaderTds[i].show();
-      }
-      var weekTdCols=this.weekTds.length;
-      Ispaces.logger.debug(this.classId+'.showWeek(): weekTdCols = '+weekTdCols);
-      for(var i=0;i<weekTdCols;i++){
-        this.weekTds[i].show();
-      }
-      this.showingDay=false;
-    }
-
-    this.weekDiv.show();
-
+            if (this.showingDay) {
+                var cols=this.weekHeaderTds.length;
+                for(var i=0;i<cols;i++){
+                    this.weekHeaderTds[i].show();
+                }
+                var weekTdCols=this.weekTds.length;
+                Ispaces.log.debug(this.classId+'.showWeek(): weekTdCols = '+weekTdCols);
+                for(var i=0;i<weekTdCols;i++){
+                    this.weekTds[i].show();
+                }
+                this.showingDay=false;
+            }
+            this.weekDiv.show();
         }
 
-        , showDay : function() {
-            Ispaces.logger.alert(this.classId+'.showDay()');
+        , showDay: function() {
+            Ispaces.log.debug(this.classId+'.showDay()');
+            if (this.monthDiv) this.monthDiv.hide();
+            Ispaces.log.debug(this.classId+'.showDay(): this.showingDay = '+this.showingDay);
+            /*
+            if(this.showingDay){ // if we click the week button a second time, show the day
+              this.showWeek();
+              return;
+            }
+            if(!this.weekDiv){ // if the week has never been shown
+              this.showWeek();
+            }else{
+              this.weekDiv.show();
+            }
+            if(this.showingDay||!this.weekDiv){ // if we click the week button a second time, show the day
+              this.showWeek();
+              if(this.showingDay){
+                return;
+              }
+            }else{
+              this.weekDiv.show();
+            }
+            */
 
-    if(this.monthDiv)this.monthDiv.hide();
-
-    Ispaces.logger.debug(this.classId+'.showDay(): this.showingDay = '+this.showingDay);
-
-/*
-    if(this.showingDay){ // if we click the week button a second time, show the day
-      this.showWeek();
-      return;
-    }
-
-    if(!this.weekDiv){ // if the week has never been shown
-      this.showWeek();
-    }else{
-      this.weekDiv.show();
-    }
-    if(this.showingDay||!this.weekDiv){ // if we click the week button a second time, show the day
-      this.showWeek();
-      if(this.showingDay){
-        return;
-      }
-    }else{
-      this.weekDiv.show();
-    }
-*/
-
-    this.monthSelector.hide();
-    this.weekSelector.hide();
-    this.daySelector.show();
-    this.buttonMonth.setClass('positive-notop-on');
-    this.buttonWeek.setClass('positive-notop-on');
-    this.buttonDay.setClass('positive-notop');
+            this.monthSelector.hide();
+            this.weekSelector.hide();
+            this.daySelector.show();
+            this.buttonMonth.setClass('positive-notop-on');
+            this.buttonWeek.setClass('positive-notop-on');
+            this.buttonDay.setClass('positive-notop');
 
 
-/*
-    var cols=this.daysInWeek;
-    for(var i=0;i<cols;i++){
-      if(i!=4){
-        $('weekHeader'+i).hide();
-      }
-    }
-*/
-    var cols=this.weekHeaderTds.length;
-    for(var i=0;i<cols;i++){
-      this.weekHeaderTds[i].hide();
-    }
+            /*
+            var cols=this.daysInWeek;
+            for(var i=0;i<cols;i++){
+              if(i!=4){
+                $('weekHeader'+i).hide();
+              }
+            }
+            */
+            var cols=this.weekHeaderTds.length;
+            for(var i=0;i<cols;i++){
+              this.weekHeaderTds[i].hide();
+            }
 
-/*
-    var weekTrCols=this.weekTrs.length;
-    for(var i=0;i<weekTrCols;i++){
-      alert('this.weekTrs['+i+'].hide()');
-      this.weekTrs[i].hide();
-    }
-*/
+            /*
+            var weekTrCols=this.weekTrs.length;
+            for(var i=0;i<weekTrCols;i++){
+              alert('this.weekTrs['+i+'].hide()');
+              this.weekTrs[i].hide();
+            }
+            */
 
-/*
-    var weekCols=this.weekColgroups.length;
-    alert('weekCols = '+weekCols);
-    for(var i=0;i<weekCols;i++){
-      alert('this.weekColgroups.['+i+'].hide()');
-      this.weekColgroups[i].hide();
-    }
-*/
+            /*
+            var weekCols=this.weekColgroups.length;
+            alert('weekCols = '+weekCols);
+            for(var i=0;i<weekCols;i++){
+              alert('this.weekColgroups.['+i+'].hide()');
+              this.weekColgroups[i].hide();
+            }
+            */
 
-///*
-    var weekTdCols=this.weekTds.length;
-    Ispaces.logger.debug(this.classId+'.showDay(): weekTdCols = '+weekTdCols);
-    for(var i=0;i<weekTdCols;i++){
-      this.weekTds[i].hide();
-    }
-//*/
-    this.showingDay=true;
+            ///*
+            var weekTdCols=this.weekTds.length;
+            Ispaces.log.debug(this.classId+'.showDay(): weekTdCols = '+weekTdCols);
+            for(var i=0;i<weekTdCols;i++){
+              this.weekTds[i].hide();
+            }
+            //*/
+            this.showingDay=true;
         }
 
         , createMonthCalendar:function(){
-            Ispaces.logger.debug(this.classId+'.createMonthCalendar()');
-            //Ispaces.logger.alert(this.classId+'.createMonthCalendar()');
+            Ispaces.log.debug(this.classId+'.createMonthCalendar()');
+            //Ispaces.log.alert(this.classId+'.createMonthCalendar()');
             //alert(this.classId+'.createMonthCalendar()');
 
             var ElementNames = Ispaces.Constants.ElementNames;
@@ -1437,171 +1390,165 @@ Ispaces.Common.extend(
         }
 
         , createWeekCalendar : function() {
+            Ispaces.log.debug(this.classId+'.createWeekCalendar()');
+            this.now = new Date();
+            this.populateYearMonthDay();
 
-            Ispaces.logger.debug(this.classId+'.createWeekCalendar()');
+            this.weekDiv = this.Create.createElement(Ispaces.Constants.ElementNames.DIV);
 
-        this.now = new Date();
-        this.populateYearMonthDay();
+            this.weekHeaderTable=Ispaces.Create.createHtmlTable(null,1);
+            this.weekHeaderTable.setClass('weekHeader');
 
-        this.weekDiv = this.Create.createElement(Ispaces.Constants.ElementNames.DIV);
+            //var mainWH=Common.getWH(this.divMain);
+            //var totalWidth=mainWH[0]-16-40;
+            //this.headerWidth=Math.floor((totalWidth/this.daysInWeek));
+            //this.headerWidthMiWi=this.headerWidth-33;
 
-        this.weekHeaderTable=Ispaces.Create.createHtmlTable(null,1);
-        this.weekHeaderTable.setClass('weekHeader');
+            //Ispaces.log.debug(this.classId+'.createWeekCalendar(): mainWH[0] = '+mainWH[0]);
+            //Ispaces.log.debug(this.classId+'.createWeekCalendar(): totalWidth = '+totalWidth);
+            //Ispaces.log.debug(this.classId+'.createWeekCalendar(): this.headerWidth = '+this.headerWidth);
 
-        //var mainWH=Common.getWH(this.divMain);
-        //var totalWidth=mainWH[0]-16-40;
-        //this.headerWidth=Math.floor((totalWidth/this.daysInWeek));
-        //this.headerWidthMiWi=this.headerWidth-33;
+            //this.refreshWeekHeader();
 
-        //Ispaces.logger.debug(this.classId+'.createWeekCalendar(): mainWH[0] = '+mainWH[0]);
-        //Ispaces.logger.debug(this.classId+'.createWeekCalendar(): totalWidth = '+totalWidth);
-        //Ispaces.logger.debug(this.classId+'.createWeekCalendar(): this.headerWidth = '+this.headerWidth);
+            var divScroll=this.Create.createDiv();
+            var scrollbarWidth=getScrollbarWidth();
+            Ispaces.log.debug(this.classId+'.createWeekCalendar(): scrollbarWidth = '+scrollbarWidth);
+            //divScroll.wi((scrollbarWidth-1));
+            //divScroll.hi(this.heightDayHeader);
+            //divScroll.bo(CCC1);
+            //divScroll.boW('1px 1px 1px 0');
 
-        //this.refreshWeekHeader();
+            var weekHeaderTableDiv=this.Create.createCell(this.weekHeaderTable);
+            //weekHeaderTableDiv.alT();
+            var weekHeaderTableDivScroll=this.Create.createCell(divScroll);
 
-        var divScroll=this.Create.createDiv();
-        var scrollbarWidth=getScrollbarWidth();
-        Ispaces.logger.debug(this.classId+'.createWeekCalendar(): scrollbarWidth = '+scrollbarWidth);
-        //divScroll.wi((scrollbarWidth-1));
-        //divScroll.hi(this.heightDayHeader);
-        //divScroll.bo(CCC1);
-        //divScroll.boW('1px 1px 1px 0');
+            //weekHeaderTableDivScroll.wip(1);
+            var weekHeaderTableDivRow = this.Create.createRow([weekHeaderTableDiv,weekHeaderTableDivScroll]);
+            var weekHeaderTableDivTable=this.Create.createDivTable(weekHeaderTableDivRow);
+            //weekHeaderTableDivTable.wip(100);
 
-        var weekHeaderTableDiv=this.Create.createCell(this.weekHeaderTable);
-        //weekHeaderTableDiv.alT();
-        var weekHeaderTableDivScroll=this.Create.createCell(divScroll);
+            this.weekDiv.add(weekHeaderTableDivTable);
+            //this.weekDiv.owX(Ispaces.Constants.Properties.HIDDEN);
+            this.divMain.add(this.weekDiv);
 
-        //weekHeaderTableDivScroll.wip(1);
-        var weekHeaderTableDivRow = this.Create.createRow([weekHeaderTableDiv,weekHeaderTableDivScroll]);
-        var weekHeaderTableDivTable=this.Create.createDivTable(weekHeaderTableDivRow);
-        //weekHeaderTableDivTable.wip(100);
+            this.weekTableDiv=this.Create.createDiv();
+            //this.weekTableDiv.owX(Ispaces.Constants.Properties.HIDDEN);
+            //this.weekTableDiv.owY(Ispaces.Constants.Properties.AUTO);
+            //this.weekTableDiv.hi(mainWH[1]-this.heightDayHeader-2);
+            this.addResizable(this.weekTableDiv);
+            this.weekTableDiv.name='this.weekTableDiv';
 
-        this.weekDiv.add(weekHeaderTableDivTable);
-        //this.weekDiv.owX(Ispaces.Constants.Properties.HIDDEN);
-        this.divMain.add(this.weekDiv);
+            this.weekTable=Ispaces.Create.createHtmlTable(null,1);
+            this.weekTable.setClass('week');
 
-        this.weekTableDiv=this.Create.createDiv();
-        //this.weekTableDiv.owX(Ispaces.Constants.Properties.HIDDEN);
-        //this.weekTableDiv.owY(Ispaces.Constants.Properties.AUTO);
-        //this.weekTableDiv.hi(mainWH[1]-this.heightDayHeader-2);
-        this.addResizable(this.weekTableDiv);
-        this.weekTableDiv.name='this.weekTableDiv';
+            this.weekTableDiv.add(this.weekTable);
+            this.weekDiv.add(this.weekTableDiv);
+            //this.weekDiv.name='this.weekDiv';
 
-        this.weekTable=Ispaces.Create.createHtmlTable(null,1);
-        this.weekTable.setClass('week');
-
-        this.weekTableDiv.add(this.weekTable);
-        this.weekDiv.add(this.weekTableDiv);
-        //this.weekDiv.name='this.weekDiv';
-
-        this.refreshWeek();
+            this.refreshWeek();
 
         }
 
         , refreshWeekHeader : function(weekStartDate) {
+            Ispaces.log.debug(this.classId+'.refreshWeekHeader('+weekStartDate+')');
+            if(!weekStartDate){
+              weekStartDate=this.getWeekStartDate();
+            }
+            Ispaces.log.debug(this.classId+'.refreshWeekHeader(): weekStartDate = '+weekStartDate);
 
-            Ispaces.logger.debug(this.classId+'.refreshWeekHeader('+weekStartDate+')');
+            var month=this.month+1;
+            var daysInMonth=this.getDaysInMonth();
+            Ispaces.log.debug(this.classId+'.refreshWeekHeader(): daysInMonth = '+daysInMonth);
 
-    if(!weekStartDate){
-      weekStartDate=this.getWeekStartDate();
-    }
-    Ispaces.logger.debug(this.classId+'.refreshWeekHeader(): weekStartDate = '+weekStartDate);
+            var weekEndDate=weekStartDate+(this.daysInWeek-1);
+            if(weekEndDate>daysInMonth){
+              weekEndDate=weekEndDate-daysInMonth;
+            }
+            Ispaces.log.debug(this.classId+'.refreshWeekHeader(): weekEndDate = '+weekEndDate);
 
-    var month=this.month+1;
-    var daysInMonth=this.getDaysInMonth();
-    Ispaces.logger.debug(this.classId+'.refreshWeekHeader(): daysInMonth = '+daysInMonth);
+            var weekDate=weekStartDate;
+            var tHead=this.Create.createElement(Ispaces.Constants.ElementNames.THEAD);
+            var cols=this.daysInWeek;
+            var tr=this.Create.createElement(Ispaces.Constants.ElementNames.TR);
+            this.weekHeaderTds=[];
+            for(var i=-1;i<cols;i++){
+              var th=this.Create.createElement(Ispaces.Constants.ElementNames.TH);
+              //td.id='weekHeader'+i;
+              tr.add(th);
 
-    var weekEndDate=weekStartDate+(this.daysInWeek-1);
-    if(weekEndDate>daysInMonth){
-      weekEndDate=weekEndDate-daysInMonth;
-    }
-    Ispaces.logger.debug(this.classId+'.refreshWeekHeader(): weekEndDate = '+weekEndDate);
+              if(i==-1){ // The time column
 
-    var weekDate=weekStartDate;
-    var tHead=this.Create.createElement(Ispaces.Constants.ElementNames.THEAD);
-    var cols=this.daysInWeek;
-    var tr=this.Create.createElement(Ispaces.Constants.ElementNames.TR);
-    this.weekHeaderTds=[];
-    for(var i=-1;i<cols;i++){
-      var th=this.Create.createElement(Ispaces.Constants.ElementNames.TH);
-      //td.id='weekHeader'+i;
-      tr.add(th);
+                var divTime=this.Create.createDiv();
+                divTime.wi(33);
+                //divTime.co('#6c6c6c');
+                //divTime.ba(this.colorHeader);
+                divTime.add(this.Create.createText(Ispaces.Constants.Characters.NBSP));
+                th.wi(33);
+                th.add(divTime);
 
-      if(i==-1){ // The time column
+              }else{
 
-        var divTime=this.Create.createDiv();
-        divTime.wi(33);
-        //divTime.co('#6c6c6c');
-        //divTime.ba(this.colorHeader);
-        divTime.add(this.Create.createText(Ispaces.Constants.Characters.NBSP));
-        th.wi(33);
-        th.add(divTime);
+                if(weekDate>daysInMonth){
+                  weekDate=1;
+                  month+=1;
+                }
 
-      }else{
+                var divDay=this.Create.createDiv();
+                //divDay.wi(this.headerWidth);
+                divDay.miWi(this.headerWidthMiWi);
+                //divDay.hi(33);
+                divDay.fW('bold');
+                divDay.fZ(14);
+                //divDay.co('#6c6c6c'); // #6c6c6c, #40AF22
+                //divDay.ba(F7F7F7);
+                if(this.dateSelected==weekDate){
+                  th.setClass('today');
+                  //divDay.co(Ispaces.Constants.Colors.FFF);
+                  //divDay.co('#5d5d5d');
+                }else{
+                  this.weekHeaderTds.push(th);
+                }
+                divDay.boW('1px 0 1px 0');
+                //divDay.alC();
+                //divDay.ma('8px 0 -8px 0');
 
-        if(weekDate>daysInMonth){
-          weekDate=1;
-          month+=1;
-        }
+                divDay.add(this.Create.createText(this.DAYS_ABBR[i]));
+                //divDay.add(this.Create.createText(Ispaces.Constants.Characters.SPACE+weekDate++));
 
-        var divDay=this.Create.createDiv();
-        //divDay.wi(this.headerWidth);
-        divDay.miWi(this.headerWidthMiWi);
-        //divDay.hi(33);
-        divDay.fW('bold');
-        divDay.fZ(14);
-        //divDay.co('#6c6c6c'); // #6c6c6c, #40AF22
-        //divDay.ba(F7F7F7);
-        if(this.dateSelected==weekDate){
-          th.setClass('today');
-          //divDay.co(Ispaces.Constants.Colors.FFF);
-          //divDay.co('#5d5d5d');
-        }else{
-          this.weekHeaderTds.push(th);
-        }
-        divDay.boW('1px 0 1px 0');
-        //divDay.alC();
-        //divDay.ma('8px 0 -8px 0');
-
-        divDay.add(this.Create.createText(this.DAYS_ABBR[i]));
-        //divDay.add(this.Create.createText(Ispaces.Constants.Characters.SPACE+weekDate++));
-
-        //divDay.add(this.Create.createText(Ispaces.Constants.Characters.SPACE+this.getTh(weekDate++)));
-        //divDay.add(this.Create.createText(Ispaces.Constants.Characters.SPACE+(weekDate++)+'/'+month));
-        divDay.add(this.Create.createText(Ispaces.Constants.Characters.SPACE+(month)+'/'+(weekDate++)));
+                //divDay.add(this.Create.createText(Ispaces.Constants.Characters.SPACE+this.getTh(weekDate++)));
+                //divDay.add(this.Create.createText(Ispaces.Constants.Characters.SPACE+(weekDate++)+'/'+month));
+                divDay.add(this.Create.createText(Ispaces.Constants.Characters.SPACE+(month)+'/'+(weekDate++)));
 
 
-        th.hi(this.heightDayHeader);
-        th.alCM();
-        th.add(divDay);
+                th.hi(this.heightDayHeader);
+                th.alCM();
+                th.add(divDay);
 
-      }
-    }
-    tHead.add(tr);
-    //this.weekHeaderTable.add(tHead);
+              }
+            }
+            tHead.add(tr);
+            //this.weekHeaderTable.add(tHead);
 
-    var curHead=_(this.weekHeaderTable,Constants.ElementNames.THEAD);
-
-    if(curHead&&curHead.length>0){
-      Ispaces.logger.debug(this.classId+'.refresh(): curHead = '+curHead);
-      Ispaces.logger.debug(this.classId+'.refresh(): curHead.length = '+curHead.length);
-      //this.weekHeaderTable.replace(tHead,curHead[0]);
-      this.weekHeaderTable.replaceFirst(tHead);
-    }else{
-      this.weekHeaderTable.add(tHead);
-    }
-
+            var curHead=_(this.weekHeaderTable,Constants.ElementNames.THEAD);
+            if(curHead&&curHead.length>0){
+              Ispaces.log.debug(this.classId+'.refresh(): curHead = '+curHead);
+              Ispaces.log.debug(this.classId+'.refresh(): curHead.length = '+curHead.length);
+              //this.weekHeaderTable.replace(tHead,curHead[0]);
+              this.weekHeaderTable.replaceFirst(tHead);
+            }else{
+              this.weekHeaderTable.add(tHead);
+            }
         }
 
         , refreshWeek : function(weekStartDate) {
-            Ispaces.logger.debug(this.classId+'.refreshWeek('+weekStartDate+')');
+            Ispaces.log.debug(this.classId+'.refreshWeek('+weekStartDate+')');
 
             if(!this.weekHeaderTable) this.createWeekCalendar();
 
             if(!weekStartDate) weekStartDate=this.getWeekStartDate();
     
             var weekDate=weekStartDate;
-            Ispaces.logger.debug('weekDate = '+weekDate);
+            Ispaces.log.debug('weekDate = '+weekDate);
 
             this.refreshWeekHeader(weekStartDate);
 
@@ -1610,9 +1557,9 @@ Ispaces.Common.extend(
             if(this.monthDiv)this.monthDiv.hide();
             this.weekDiv.show();
 
-            Ispaces.logger.debug('this.apHeight = '+this.apHeight);
+            Ispaces.log.debug('this.apHeight = '+this.apHeight);
             var mainWH=Ispaces.Common.getWidthHeight(this.divMain);
-            Ispaces.logger.debug('mainWH[1] = '+mainWH[1]);
+            Ispaces.log.debug('mainWH[1] = '+mainWH[1]);
 
             var tBody = this.Create.createElement('tbody');
 
@@ -1637,7 +1584,7 @@ Ispaces.Common.extend(
                     isPm=true;
                 }
 
-                Ispaces.logger.debug('hour = '+hour);
+                Ispaces.log.debug('hour = '+hour);
 
                 hourOfDay = this.getNextHour(hourOfDay);
 
@@ -1728,8 +1675,8 @@ Ispaces.Common.extend(
             var curBody = this.weekTable.getElementsByTagName(Ispaces.Constants.ElementNames.TBODY);
 
             if(curBody&&curBody.length>0){
-                Ispaces.logger.debug(this.classId+'.refresh(): curBody = '+curBody);
-                Ispaces.logger.debug(this.classId+'.refresh(): curBody.length = '+curBody.length);
+                Ispaces.log.debug(this.classId+'.refresh(): curBody = '+curBody);
+                Ispaces.log.debug(this.classId+'.refresh(): curBody.length = '+curBody.length);
                 this.weekTable.replaceFirst(tBody);
                 //this.weekTable.replace(this.tBodyWeek,curBody[0]);
             }else{
@@ -1740,28 +1687,27 @@ Ispaces.Common.extend(
         } // refreshWeek : function(weekStartDate) {
 
         , refreshMonth : function() {
-            Ispaces.logger.alert(this.classId+'.refreshMonth()');
-
-            var _this=this;
+            Ispaces.log.debug(this.classId+'.refreshMonth()');
+            var _this = this;
             var Create = this.Create;
 
             var monthDate=new Date(this.year, this.month, 1);
             this.monthWeekday=monthDate.getDay();
 
-            Ispaces.logger.debug('monthDate = '+monthDate);
-            Ispaces.logger.debug('this.monthWeekday = '+this.monthWeekday);
-            Ispaces.logger.debug('this.entries.length = '+this.entries.length);
+            Ispaces.log.debug('monthDate = '+monthDate);
+            Ispaces.log.debug('this.monthWeekday = '+this.monthWeekday);
+            Ispaces.log.debug('this.entries.length = '+this.entries.length);
 
             this.weekStartDay=0;
             var offset=0;
             offset=(this.monthWeekday>=this.weekStartDay)?this.monthWeekday-this.weekStartDay:7-this.weekStartDay+this.monthWeekday;
-            Ispaces.logger.debug('offset = '+offset);
+            Ispaces.log.debug('offset = '+offset);
 
             var daysInMonth=this.getDaysInMonth();
             var daysInMonthPrev=this.DAYS_IN_MONTH[this.getMnthPrev(this.month)];
 
-            Ispaces.logger.debug('daysInMonth = '+daysInMonth);
-            Ispaces.logger.debug('daysInMonthPrev = '+daysInMonthPrev);
+            Ispaces.log.debug('daysInMonth = '+daysInMonth);
+            Ispaces.log.debug('daysInMonthPrev = '+daysInMonthPrev);
 
             var tBody = this.Create.createElement(Ispaces.Constants.ElementNames.TBODY);
 
@@ -1772,16 +1718,16 @@ Ispaces.Common.extend(
             var daysCount=0;
             var rows=1;
             var daysInRowOne=this.daysInWeek-this.monthWeekday;
-            Ispaces.logger.debug('daysInRowOne = '+daysInRowOne);
+            Ispaces.log.debug('daysInRowOne = '+daysInRowOne);
             daysCount+=daysInRowOne;
-            Ispaces.logger.debug('daysCount = '+daysCount);
+            Ispaces.log.debug('daysCount = '+daysCount);
             while(daysCount<daysInMonth){
                 daysCount+=this.daysInWeek;
-                Ispaces.logger.debug('daysCount = '+daysCount);
+                Ispaces.log.debug('daysCount = '+daysCount);
                 rows++;
-                Ispaces.logger.debug('rows = '+rows);
+                Ispaces.log.debug('rows = '+rows);
             }
-            Ispaces.logger.debug('rows = '+rows);
+            Ispaces.log.debug('rows = '+rows);
 
             for(var i=0; i<rows; i++) {
 
@@ -1815,7 +1761,7 @@ Ispaces.Common.extend(
 
                         if(calItems && calItems.length>0){ // We have calendar entries
 
-                            Ispaces.logger.debug('calItems ='+calItems.length);
+                            Ispaces.log.debug('calItems ='+calItems.length);
                             var calItemsDiv=this.createCalItemsDiv(calItems,td.dayOfMonth);
                             td.ow(Ispaces.Constants.Properties.HIDDEN);
                             td.add(calItemsDiv);
@@ -1860,18 +1806,18 @@ Ispaces.Common.extend(
 
                         /*
                         for(var i=0;i<this.entries.length;i++){
-                        //Ispaces.logger.alert('this.entries['+i+'] = '+this.entries[i]);
-                        //Ispaces.logger.alert('this.entries['+i+'].where = '+this.entries[i].where);
+                        //Ispaces.log.alert('this.entries['+i+'] = '+this.entries[i]);
+                        //Ispaces.log.alert('this.entries['+i+'].where = '+this.entries[i].where);
                         //var calItem=this.entries[i];
                         }
-                        Ispaces.logger.debug('calItem = '+calItem);
-                        Ispaces.logger.debug('calItem[\'where\'] = '+calItem['where']);
+                        Ispaces.log.debug('calItem = '+calItem);
+                        Ispaces.log.debug('calItem[\'where\'] = '+calItem['where']);
                         */
                         var today=(dayOfMonth==this.date&&this.monthSelected==this.month);
-                        Ispaces.logger.debug('dayOfMonth:'+dayOfMonth+', today = '+today);
+                        Ispaces.log.debug('dayOfMonth:'+dayOfMonth+', today = '+today);
 
                         if(today) {
-                            Ispaces.logger.debug('dayOfMonth:'+dayOfMonth+', today = '+today);
+                            Ispaces.log.debug('dayOfMonth:'+dayOfMonth+', today = '+today);
                             td.setClass('today');
                             //td.ba('#ffcc00');
                         }
@@ -1885,7 +1831,7 @@ Ispaces.Common.extend(
 
                             , function(){
 
-                              Ispaces.logger.alert('td.oc()');
+                              Ispaces.log.alert('td.oc()');
 
                               _td=this;
 
@@ -1896,7 +1842,7 @@ Ispaces.Common.extend(
                               var mainWH = Ispaces.Common.getWidthHeight(_this.divMain);
                               var menuWH = Ispaces.Common.getWidthHeight(_this.menu);
 
-                              Ispaces.logger.alert('td.oc(): apWH[1] = '+apWH[1]+', mainWH[1] = '+mainWH[1]+', menuWH[1] = '+menuWH[1]);
+                              Ispaces.log.alert('td.oc(): apWH[1] = '+apWH[1]+', mainWH[1] = '+mainWH[1]+', menuWH[1] = '+menuWH[1]);
 
                               /*
                               var td=this.Create.createElement(Ispaces.Constants.ElementNames.TD);
@@ -2014,41 +1960,41 @@ Ispaces.Common.extend(
                               //inputSave.onclick=function(){alert('test')};
                               inputSave.oc(function(){
 
-                                Ispaces.logger.debug('inputSave.oc()');
-                                Ispaces.logger.debug('inputSave.oc(): modalWindow.id = '+ modalWindow.id);
+                                Ispaces.log.debug('inputSave.oc()');
+                                Ispaces.log.debug('inputSave.oc(): modalWindow.id = '+ modalWindow.id);
 
                                 /*
                                 var fields=[YEAR,MONTH,DAY,'what','when','where','notes'];
                                 //var calendarEntryObject=formToObject($('form-calendar-entry'),fields);
                                 var calItemJson=formToObjectString(formName,fields);
-                                Ispaces.logger.alert('calItemJson = '+calItemJson);
+                                Ispaces.log.alert('calItemJson = '+calItemJson);
                                 //var calItem=JSON.parse(line);
                                 var calItem=eval(Common.parens(calItemJson));
                                 _this.updateStore(_this.entriesName,calItem);
                                 */
 
                                 var url=Ajax.serialize(form);
-                                Ispaces.logger.debug('url = '+url);
+                                Ispaces.log.debug('url = '+url);
                                 var baseUrl=contextUrl+Ispaces.Constants.Characters.FSLASH+this.objectId;
-                                //Ispaces.logger.alert(this.classId+'.doLogin(): baseUrl = '+baseUrl);
+                                //Ispaces.log.alert(this.classId+'.doLogin(): baseUrl = '+baseUrl);
                                 var qs=new Ispaces.QueryString();
                                 //qs.append(form.action);
                                 qs.append(_this.objectId);
                                 qs.append(QUESTION);
                                 qs.append(url);
                                 qs.add(TASKID,'save');
-                                Ispaces.logger.alert('qs.asString() = '+qs.asString());
+                                Ispaces.log.alert('qs.asString() = '+qs.asString());
                                 var ajax=new Ispaces.Ajax(qs.asString(),function(r){_this.processSave(r)});
                                 ajax.doGet();
 
 
                             /*
                                 //alert(calendarEntryObject.toJSONString());
-                                //Ispaces.logger.debug('calendarEntryObject.toJson(): '+calendarEntryObject.toJson());
+                                //Ispaces.log.debug('calendarEntryObject.toJson(): '+calendarEntryObject.toJson());
                                 //alert('calendarEntryObject.toJson().asString(): '+calendarEntryObject.toJson().asString());
                                 var json=JSON.stringify(calendarEntryObject);
-                                //Ispaces.logger.debug('JSON.stringify(calendarEntryObject) = '+JSON.stringify(calendarEntryObject));
-                                Ispaces.logger.debug('json = '+json);
+                                //Ispaces.log.debug('JSON.stringify(calendarEntryObject) = '+JSON.stringify(calendarEntryObject));
+                                Ispaces.log.debug('json = '+json);
 
                                 //var jsonObj=JSON.parse(json);
                                 var jsonObj=JSON.parse(json, function (key, value) {
@@ -2089,9 +2035,9 @@ Ispaces.Common.extend(
                                 });
                                 alert('cI = '+cI);
                                 alert('typeof cI = '+typeof cI);
-                                Ispaces.logger.printObject(cI);
+                                Ispaces.log.printObject(cI);
                                 for(var n in cI){
-                                  Ispaces.logger.debug('n = '+n);
+                                  Ispaces.log.debug('n = '+n);
                                   //alert('calItem['+n+'] = '+calItem[n]);
                                   //var v = calItem[n];
                                   //alert(n+' = '+v);
@@ -2194,19 +2140,19 @@ Ispaces.Common.extend(
             //var currentTBody = null;
             //if(this.monthTable) currentTBody = this.monthTable.currentTBody;
 
-            Ispaces.logger.debug('curBody = '+curBody);
+            Ispaces.log.debug('curBody = '+curBody);
 
             if(curBody&&curBody.length>0){
             //if(currentTBody) {
 
-                //Ispaces.logger.alert('curBody = '+curBody);
-                //Ispaces.logger.debug('curBody.length = '+curBody.length);
+                //Ispaces.log.alert('curBody = '+curBody);
+                //Ispaces.log.debug('curBody.length = '+curBody.length);
                 this.monthTable.replace(tBody, curBody[0]);
                 //this.monthTable.replace(tBody, currentTBody);
 
                 //var curBody2=_(this.monthTable,'tbody');
-                //Ispaces.logger.debug('curBody2 = '+curBody2);
-                //Ispaces.logger.debug('curBody2.length = '+curBody2.length);
+                //Ispaces.log.debug('curBody2 = '+curBody2);
+                //Ispaces.log.debug('curBody2.length = '+curBody2.length);
 
             } else {
                 //this.monthTable.currentTBody = tBody;
@@ -2218,11 +2164,11 @@ Ispaces.Common.extend(
         } // refreshMonth : function() {
 
         , processSave : function(r) {
-            Ispaces.logger.alert(this.classId+'.processSave('+r+')');
+            Ispaces.log.alert(this.classId+'.processSave('+r+')');
         }
 
         , disableResizing:function(){
-            Ispaces.logger.alert(this.classId+'.disableResizing()');
+            Ispaces.log.alert(this.classId+'.disableResizing()');
     /*
     for(var i=0;i<this.handles.length;i++){
       this.handles[i].disable();
@@ -2231,261 +2177,257 @@ Ispaces.Common.extend(
         }
 
         , enableResizing:function(){
-            Ispaces.logger.alert(this.classId+'.enableResizing()');
-    /*
-    for(var i=0;i<this.handles.length;i++){
-      this.handles[i].enable();
-    }
-    */
+            Ispaces.log.alert(this.classId+'.enableResizing()');
+            /*
+            for(var i=0;i<this.handles.length;i++){
+              this.handles[i].enable();
+            }
+            */
         }
 
         , addResizable:function(resizable){
-            Ispaces.logger.debug(this.classId+'.addResizable()');
-    /*
-    for(var i=0;i<this.handles.length;i++){
-      this.handles[i].addResizable(resizable);
-    }
-    */
+            Ispaces.log.debug(this.classId+'.addResizable()');
+            /*
+            for(var i=0;i<this.handles.length;i++){
+              this.handles[i].addResizable(resizable);
+            }
+            */
         }
 
         , calculateHeight:function(){
-            Ispaces.logger.alert(this.classId+'.calculateHeight()');
-
+            Ispaces.log.alert(this.classId+'.calculateHeight()');
             if(!viewableWH)viewableWH=getViewableWH();
-            if(this.topMenu)if(!this.topMenu.wh)this.topMenu.wh=Common.getWH(this.topMenu);
+            if(this.topMenu)if(!this.topMenu.widthHeight)this.topMenu.widthHeight=Common.getWH(this.topMenu);
+            /*
+            Ispaces.log.alert(this.id+'.calculateHeight(): viewableWH[0] = '+viewableWH[0]+', viewableWH[1] = '+viewableWH[1]);
+            Ispaces.log.alert(this.id+'.calculateHeight(): this.topMenu.widthHeight[0] = '+this.topMenu.widthHeight[0]+', this.topMenu.widthHeight[1] = '+this.topMenu.widthHeight[1]);
+            Ispaces.log.alert(this.id+'.calculateHeight(): this.bottomMenu.widthHeight[0] = '+this.bottomMenu.widthHeight[0]+', this.bottomMenu.widthHeight[1] = '+this.bottomMenu.widthHeight[1]);
+            Ispaces.log.alert(this.id+'.calculateHeight(): this.resizableWindow.titlebar.widthHeight[0] = '+this.resizableWindow.titlebar.widthHeight[0]+', this.resizableWindow.titlebar.widthHeight[1] = '+this.resizableWindow.titlebar.widthHeight[1]);
+            Ispaces.log.alert(this.id+'.calculateHeight(): taskbar.widthHeight[0] = '+taskbar.widthHeight[0]+', taskbar.widthHeight[1] = '+taskbar.widthHeight[1]);
+            Ispaces.log.alert(this.id+'.calculateHeight(): taskbar.divTable.widthHeight[0] = '+taskbar.divTable.widthHeight[0]+', taskbar.divTable.widthHeight[1] = '+taskbar.divTable.widthHeight[1]);
+            Ispaces.log.alert(this.id+'.calculateHeight(): taskbar.autoHiding = '+taskbar.autoHiding);
+            */
 
-    /*
-    Ispaces.logger.alert(this.id+'.calculateHeight(): viewableWH[0] = '+viewableWH[0]+', viewableWH[1] = '+viewableWH[1]);
-    Ispaces.logger.alert(this.id+'.calculateHeight(): this.topMenu.wh[0] = '+this.topMenu.wh[0]+', this.topMenu.wh[1] = '+this.topMenu.wh[1]);
-    Ispaces.logger.alert(this.id+'.calculateHeight(): this.bottomMenu.wh[0] = '+this.bottomMenu.wh[0]+', this.bottomMenu.wh[1] = '+this.bottomMenu.wh[1]);
-    Ispaces.logger.alert(this.id+'.calculateHeight(): this.resizableWindow.titlebar.wh[0] = '+this.resizableWindow.titlebar.wh[0]+', this.resizableWindow.titlebar.wh[1] = '+this.resizableWindow.titlebar.wh[1]);
-    Ispaces.logger.alert(this.id+'.calculateHeight(): taskbar.wh[0] = '+taskbar.wh[0]+', taskbar.wh[1] = '+taskbar.wh[1]);
-    Ispaces.logger.alert(this.id+'.calculateHeight(): taskbar.divTable.wh[0] = '+taskbar.divTable.wh[0]+', taskbar.divTable.wh[1] = '+taskbar.divTable.wh[1]);
-    Ispaces.logger.alert(this.id+'.calculateHeight(): taskbar.autoHiding = '+taskbar.autoHiding);
-    */
-
-    var h=viewableWH[1];
-    if(this.topMenu)h-=this.topMenu.wh[1];
-    h-=this.resizableWindow.titlebar.wh[1];
-    h-=3; // Back the bottom off a little.
-    //Ispaces.logger.alert(this.id+'.calculateHeight(): h='+h);
-
-    //return {w:w,h:h};
-    //return {w:windowWH[0],h:h};
-    return {w:viewableWH[0],h:h};
-
+            var h=viewableWH[1];
+            if(this.topMenu)h-=this.topMenu.widthHeight[1];
+            h-=this.resizableWindow.titlebar.widthHeight[1];
+            h-=3; // Back the bottom off a little.
+            //Ispaces.log.alert(this.id+'.calculateHeight(): h='+h);
+            //return {w:w,h:h};
+            //return {w:windowWH[0],h:h};
+            return {w:viewableWH[0],h:h};
         }
 
         , calculateAppDivHeight:function(){
-    Ispaces.logger.alert(this.classId+'.calculateAppDivHeight()');
-    if(!viewableWH)viewableWH=getViewableWH();
-    /*
-    Ispaces.logger.alert(this.id+'.calculateAppDivHeight(): viewableWH[0] = '+viewableWH[0]+', viewableWH[1] = '+viewableWH[1]);
-    Ispaces.logger.alert(this.id+'.calculateAppDivHeight(): this.topMenu.wh[0] = '+this.topMenu.wh[0]+', this.topMenu.wh[1] = '+this.topMenu.wh[1]);
-    */
-    var h=viewableWH[1];
-    h-=this.resizableWindow.titlebar.wh[1];
-    //Ispaces.logger.alert(this.id+'.calculateAppDivHeight(): h='+h);
-    return {w:viewableWH[0],h:h};
+            Ispaces.log.alert(this.classId+'.calculateAppDivHeight()');
+            if(!viewableWH)viewableWH=getViewableWH();
+            /*
+            Ispaces.log.alert(this.id+'.calculateAppDivHeight(): viewableWH[0] = '+viewableWH[0]+', viewableWH[1] = '+viewableWH[1]);
+            Ispaces.log.alert(this.id+'.calculateAppDivHeight(): this.topMenu.widthHeight[0] = '+this.topMenu.widthHeight[0]+', this.topMenu.widthHeight[1] = '+this.topMenu.widthHeight[1]);
+            */
+            var h=viewableWH[1];
+            h-=this.resizableWindow.titlebar.widthHeight[1];
+            //Ispaces.log.alert(this.id+'.calculateAppDivHeight(): h='+h);
+            return {w:viewableWH[0],h:h};
         }
 
         , calculateHalfHeight:function(){
-    Ispaces.logger.alert(this.classId+'.calculateHalfHeight()');
-    if(!viewableWH)viewableWH=getViewableWH();
-    if(this.topMenu)if(!this.topMenu.wh)this.topMenu.wh=Common.getWH(this.topMenu);
-    var h=viewableWH[1];
-    var h=h/2;
-    if(this.topMenu)h-=this.topMenu.wh[1];
-    h-=this.resizableWindow.titlebar.wh[1];
-    //Ispaces.logger.alert(this.id+'.calculateHalfHeight(): h='+h);
-    return {w:viewableWH[0],h:h};
+            Ispaces.log.alert(this.classId+'.calculateHalfHeight()');
+            if(!viewableWH)viewableWH=getViewableWH();
+            if(this.topMenu)if(!this.topMenu.widthHeight)this.topMenu.widthHeight=Common.getWH(this.topMenu);
+            var h=viewableWH[1];
+            var h=h/2;
+            if(this.topMenu)h-=this.topMenu.widthHeight[1];
+            h-=this.resizableWindow.titlebar.widthHeight[1];
+            //Ispaces.log.alert(this.id+'.calculateHalfHeight(): h='+h);
+            return {w:viewableWH[0],h:h};
         }
 
         , calculateAppDivHalfHeight:function(){
-    Ispaces.logger.alert(this.classId+'.calculateAppDivHalfHeight()');
-    if(!viewableWH)viewableWH=getViewableWH();
-    var h=viewableWH[1];
-    var h=h/2;
-    h-=this.resizableWindow.titlebar.wh[1];
-    //Ispaces.logger.alert(this.id+'.calculateAppDivHalfHeight(): h='+h);
-    return {w:viewableWH[0],h:h};
+            Ispaces.log.alert(this.classId+'.calculateAppDivHalfHeight()');
+            if(!viewableWH)viewableWH=getViewableWH();
+            var h=viewableWH[1];
+            var h=h/2;
+            h-=this.resizableWindow.titlebar.widthHeight[1];
+            //Ispaces.log.alert(this.id+'.calculateAppDivHalfHeight(): h='+h);
+            return {w:viewableWH[0],h:h};
         }
 
         , calculateHalfWidth:function(){
-    Ispaces.logger.alert(this.classId+'.calculateHalfWidth()');
-    if(!viewableWH)viewableWH=getViewableWH();
-    if(this.topMenu)if(!this.topMenu.wh)this.topMenu.wh=Common.getWH(this.topMenu);
-    /*
-    Ispaces.logger.alert(this.id+'.calculateHalfWidth(): windowWH[0] = '+windowWH[0]+', windowWH[1] = '+windowWH[1]);
-    Ispaces.logger.alert(this.id+'.calculateHeight(): this.bottomMenu.wh[0] = '+this.bottomMenu.wh[0]+', this.bottomMenu.wh[1] = '+this.bottomMenu.wh[1]);
-    Ispaces.logger.alert(this.id+'.calculateHeight(): this.resizableWindow.titlebar.wh[0] = '+this.resizableWindow.titlebar.wh[0]+', this.resizableWindow.titlebar.wh[1] = '+this.resizableWindow.titlebar.wh[1]);
-    Ispaces.logger.alert(this.id+'.calculateHeight(): taskbar.wh[0] = '+taskbar.wh[0]+', taskbar.wh[1] = '+taskbar.wh[1]);
-    Ispaces.logger.alert(this.id+'.calculateHeight(): taskbar.divTable.wh[0] = '+taskbar.divTable.wh[0]+', taskbar.divTable.wh[1] = '+taskbar.divTable.wh[1]);
-    Ispaces.logger.alert(this.id+'.calculateHalfWidth(): taskbar.autoHiding = '+taskbar.autoHiding);
-    */
-    var h=viewableWH[1];
-    if(this.topMenu)h-=this.topMenu.wh[1];
-    h-=this.resizableWindow.titlebar.wh[1];
-    h-=3; // Back the bottom off a little.
-    //Ispaces.logger.alert(this.id+'.calculateHeight(): h='+h);
-    var wi=viewableWH[0];
-    var wi=wi/2;
-    //Ispaces.logger.alert(this.id+'.calculateHalfWidth(): wi = '+wi);
-    return {w:wi,h:h};
+            Ispaces.log.alert(this.classId+'.calculateHalfWidth()');
+            if(!viewableWH)viewableWH=getViewableWH();
+            if(this.topMenu)if(!this.topMenu.widthHeight)this.topMenu.widthHeight=Common.getWH(this.topMenu);
+            /*
+            Ispaces.log.alert(this.id+'.calculateHalfWidth(): windowWH[0] = '+windowWH[0]+', windowWH[1] = '+windowWH[1]);
+            Ispaces.log.alert(this.id+'.calculateHeight(): this.bottomMenu.widthHeight[0] = '+this.bottomMenu.widthHeight[0]+', this.bottomMenu.widthHeight[1] = '+this.bottomMenu.widthHeight[1]);
+            Ispaces.log.alert(this.id+'.calculateHeight(): this.resizableWindow.titlebar.widthHeight[0] = '+this.resizableWindow.titlebar.widthHeight[0]+', this.resizableWindow.titlebar.widthHeight[1] = '+this.resizableWindow.titlebar.widthHeight[1]);
+            Ispaces.log.alert(this.id+'.calculateHeight(): taskbar.widthHeight[0] = '+taskbar.widthHeight[0]+', taskbar.widthHeight[1] = '+taskbar.widthHeight[1]);
+            Ispaces.log.alert(this.id+'.calculateHeight(): taskbar.divTable.widthHeight[0] = '+taskbar.divTable.widthHeight[0]+', taskbar.divTable.widthHeight[1] = '+taskbar.divTable.widthHeight[1]);
+            Ispaces.log.alert(this.id+'.calculateHalfWidth(): taskbar.autoHiding = '+taskbar.autoHiding);
+            */
+            var h=viewableWH[1];
+            if(this.topMenu)h-=this.topMenu.widthHeight[1];
+            h-=this.resizableWindow.titlebar.widthHeight[1];
+            h-=3; // Back the bottom off a little.
+            //Ispaces.log.alert(this.id+'.calculateHeight(): h='+h);
+            var wi=viewableWH[0];
+            var wi=wi/2;
+            //Ispaces.log.alert(this.id+'.calculateHalfWidth(): wi = '+wi);
+            return {w:wi,h:h};
         }
 
         , calculateAppDivHalfWidth:function(){
-    Ispaces.logger.alert(this.classId+'.calculateAppDivHalfWidth()');
-    if(!viewableWH)viewableWH=getViewableWH();
-    /*
-    Ispaces.logger.alert(this.id+'.calculateHalfWidth(): windowWH[0] = '+windowWH[0]+', windowWH[1] = '+windowWH[1]);
-    Ispaces.logger.alert(this.id+'.calculateHeight(): this.bottomMenu.wh[0] = '+this.bottomMenu.wh[0]+', this.bottomMenu.wh[1] = '+this.bottomMenu.wh[1]);
-    Ispaces.logger.alert(this.id+'.calculateHeight(): this.resizableWindow.titlebar.wh[0] = '+this.resizableWindow.titlebar.wh[0]+', this.resizableWindow.titlebar.wh[1] = '+this.resizableWindow.titlebar.wh[1]);
-    Ispaces.logger.alert(this.id+'.calculateHeight(): taskbar.wh[0] = '+taskbar.wh[0]+', taskbar.wh[1] = '+taskbar.wh[1]);
-    Ispaces.logger.alert(this.id+'.calculateHeight(): taskbar.divTable.wh[0] = '+taskbar.divTable.wh[0]+', taskbar.divTable.wh[1] = '+taskbar.divTable.wh[1]);
-    Ispaces.logger.alert(this.id+'.calculateHalfWidth(): taskbar.autoHiding = '+taskbar.autoHiding);
-    */
-    var h=viewableWH[1];
-    h-=this.resizableWindow.titlebar.wh[1];
-    h-=3; // Back the bottom off a little.
-    //Ispaces.logger.alert(this.id+'.calculateHeight(): h='+h);
-    var wi=viewableWH[0];
-    var wi=wi/2;
-    //Ispaces.logger.alert(this.id+'.calculateHalfWidth(): wi = '+wi);
-    return {w:wi,h:h};
+            Ispaces.log.alert(this.classId+'.calculateAppDivHalfWidth()');
+            if(!viewableWH)viewableWH=getViewableWH();
+            /*
+            Ispaces.log.alert(this.id+'.calculateHalfWidth(): windowWH[0] = '+windowWH[0]+', windowWH[1] = '+windowWH[1]);
+            Ispaces.log.alert(this.id+'.calculateHeight(): this.bottomMenu.widthHeight[0] = '+this.bottomMenu.widthHeight[0]+', this.bottomMenu.widthHeight[1] = '+this.bottomMenu.widthHeight[1]);
+            Ispaces.log.alert(this.id+'.calculateHeight(): this.resizableWindow.titlebar.widthHeight[0] = '+this.resizableWindow.titlebar.widthHeight[0]+', this.resizableWindow.titlebar.widthHeight[1] = '+this.resizableWindow.titlebar.widthHeight[1]);
+            Ispaces.log.alert(this.id+'.calculateHeight(): taskbar.widthHeight[0] = '+taskbar.widthHeight[0]+', taskbar.widthHeight[1] = '+taskbar.widthHeight[1]);
+            Ispaces.log.alert(this.id+'.calculateHeight(): taskbar.divTable.widthHeight[0] = '+taskbar.divTable.widthHeight[0]+', taskbar.divTable.widthHeight[1] = '+taskbar.divTable.widthHeight[1]);
+            Ispaces.log.alert(this.id+'.calculateHalfWidth(): taskbar.autoHiding = '+taskbar.autoHiding);
+            */
+            var h=viewableWH[1];
+            h-=this.resizableWindow.titlebar.widthHeight[1];
+            h-=3; // Back the bottom off a little.
+            //Ispaces.log.alert(this.id+'.calculateHeight(): h='+h);
+            var wi=viewableWH[0];
+            var wi=wi/2;
+            //Ispaces.log.alert(this.id+'.calculateHalfWidth(): wi = '+wi);
+            return {w:wi,h:h};
         }
 
         , maximize:function(){
-    //Ispaces.logger.debug(this.classId+'.maximize()');
-    this.divApplication.wh=Common.getWH(this.divApplication);
-    this.divMain.wh=Common.getWH(this.divMain);
-    /*
-    this.iframe.wh=Common.getWH(this.iframe); // Save the iframe width/height for restore.
-    */
-    /*
-    Ispaces.logger.alert(this.id+'.maximize(): this.divApplication.wh[0] = '+this.divApplication.wh[0]+', this.divApplication.wh[1] = '+this.divApplication.wh[1]);
-    Ispaces.logger.alert(this.id+'.maximize(): this.divMain.wh[0] = '+this.divMain.wh[0]+', this.divMain.wh[1] = '+this.divMain.wh[1]);
-    Ispaces.logger.alert(this.id+'.maximize(): this.iframe.wh[0]='+this.iframe.wh[0]+', this.iframe.wh[1]='+this.iframe.wh[1]);
-    */
-    var wh=this.calculateHeight();
-    //this.iframe.wihi(wh[0],wh[1]);
-    this.divMain.wihi(wh[0],wh[1]);
-    //this.divApplication.wihi(wh[0],wh[1]);
+            //Ispaces.log.debug(this.classId+'.maximize()');
+            this.divApplication.widthHeight=Common.getWH(this.divApplication);
+            this.divMain.widthHeight=Common.getWH(this.divMain);
+            /*
+            this.iframe.widthHeight=Common.getWH(this.iframe); // Save the iframe width/height for restore.
+            */
+            /*
+            Ispaces.log.alert(this.id+'.maximize(): this.divApplication.widthHeight[0] = '+this.divApplication.widthHeight[0]+', this.divApplication.widthHeight[1] = '+this.divApplication.widthHeight[1]);
+            Ispaces.log.alert(this.id+'.maximize(): this.divMain.widthHeight[0] = '+this.divMain.widthHeight[0]+', this.divMain.widthHeight[1] = '+this.divMain.widthHeight[1]);
+            Ispaces.log.alert(this.id+'.maximize(): this.iframe.widthHeight[0]='+this.iframe.widthHeight[0]+', this.iframe.widthHeight[1]='+this.iframe.widthHeight[1]);
+            */
+            var widthHeight=this.calculateHeight();
+            //this.iframe.wihi(widthHeight[0],widthHeight[1]);
+            this.divMain.wihi(widthHeight[0],widthHeight[1]);
+            //this.divApplication.wihi(widthHeight[0],widthHeight[1]);
 
-    var divApplicationHeight=this.calculateAppDivHeight();
-    this.divApplication.wihi(divApplicationHeight.w,divApplicationHeight.h);
+            var divApplicationHeight=this.calculateAppDivHeight();
+            this.divApplication.wihi(divApplicationHeight.w,divApplicationHeight.h);
 
-    this.draggableAp.removeMouseDown(); // Remove the ability to drag the window.
+            this.draggableAp.removeMouseDown(); // Remove the ability to drag the window.
         }
 
         , restore:function(){
-            //Ispaces.logger.debug(this.classId+'.restore()');
-    //this.showHandles();
-    //this.iframe.wihi(this.iframe.wh[0],this.iframe.wh[1]);
-    this.divApplication.wihi(this.divApplication.wh[0],this.divApplication.wh[1]);
-    //this.divApplication.wi(this.divApplication.wh[0]);
-    this.divMain.wihi(this.divMain.wh[0],this.divMain.wh[1]);
-    /*
-    Ispaces.logger.alert(this.id+'.restore(): this.divApplication.wh[0] = '+this.divApplication.wh[0]+', this.divApplication.wh[1] = '+this.divApplication.wh[1]);
-    Ispaces.logger.alert(this.id+'.restore(): this.divMain.wh[0] = '+this.divMain.wh[0]+', this.divMain.wh[1] = '+this.divMain.wh[1]);
-    */
-    this.draggableAp.addMouseDown(); // Re-add the ability to drag the window.
-    this.padHandles=true;
+            //Ispaces.log.debug(this.classId+'.restore()');
+            //this.showHandles();
+            //this.iframe.wihi(this.iframe.widthHeight[0],this.iframe.widthHeight[1]);
+            this.divApplication.wihi(this.divApplication.widthHeight[0],this.divApplication.widthHeight[1]);
+            //this.divApplication.wi(this.divApplication.widthHeight[0]);
+            this.divMain.wihi(this.divMain.widthHeight[0],this.divMain.widthHeight[1]);
+            /*
+            Ispaces.log.alert(this.id+'.restore(): this.divApplication.widthHeight[0] = '+this.divApplication.widthHeight[0]+', this.divApplication.widthHeight[1] = '+this.divApplication.widthHeight[1]);
+            Ispaces.log.alert(this.id+'.restore(): this.divMain.widthHeight[0] = '+this.divMain.widthHeight[0]+', this.divMain.widthHeight[1] = '+this.divMain.widthHeight[1]);
+            */
+            this.draggableAp.addMouseDown(); // Re-add the ability to drag the window.
+            this.padHandles=true;
         }
 
         , snapTop : function() {
-            //Ispaces.logger.debug(this.classId+'.snapTop()');
-    this.divApplication.wh=Common.getWH(this.divApplication);
-    this.divMain.wh=Common.getWH(this.divMain);
-    /*
-    Ispaces.logger.alert(this.id+'.snapTop(): this.divApplication.wh[0] = '+this.divApplication.wh[0]+', this.divApplication.wh[1] = '+this.divApplication.wh[1]);
-    Ispaces.logger.alert(this.id+'.snapTop(): this.divMain.wh[0] = '+this.divMain.wh[0]+', this.divMain.wh[1] = '+this.divMain.wh[1]);
-    */
-    var wh=this.calculateHalfHeight();
-    this.divMain.wihi(wh[0],wh[1]);
+            //Ispaces.log.debug(this.classId+'.snapTop()');
+            this.divApplication.widthHeight=Common.getWH(this.divApplication);
+            this.divMain.widthHeight=Common.getWH(this.divMain);
+            /*
+            Ispaces.log.alert(this.id+'.snapTop(): this.divApplication.widthHeight[0] = '+this.divApplication.widthHeight[0]+', this.divApplication.widthHeight[1] = '+this.divApplication.widthHeight[1]);
+            Ispaces.log.alert(this.id+'.snapTop(): this.divMain.widthHeight[0] = '+this.divMain.widthHeight[0]+', this.divMain.widthHeight[1] = '+this.divMain.widthHeight[1]);
+            */
+            var widthHeight=this.calculateHalfHeight();
+            this.divMain.wihi(widthHeight[0],widthHeight[1]);
 
-    var divApplicationHeight=this.calculateAppDivHalfHeight();
-    this.divApplication.wihi(divApplicationHeight.w,divApplicationHeight.h);
+            var divApplicationHeight=this.calculateAppDivHalfHeight();
+            this.divApplication.wihi(divApplicationHeight.w,divApplicationHeight.h);
 
-    this.draggableAp.removeMouseDown(); // Remove the ability to drag the window.
-    this.padHandles=false;
+            this.draggableAp.removeMouseDown(); // Remove the ability to drag the window.
+            this.padHandles=false;
         }
 
         , snapBottom:function(){
-    //Ispaces.logger.debug(this.classId+'.snapBottom()');
-    this.divApplication.wh=Common.getWH(this.divApplication);
-    this.divMain.wh=Common.getWH(this.divMain);
-    var wh=this.calculateHalfHeight();
-    this.divMain.wihi(wh[0],wh[1]-3); // Back the bottom off a little because of the shadow.
-    var divApplicationHeight=this.calculateAppDivHalfHeight();
-    this.divApplication.wihi(divApplicationHeight.w,divApplicationHeight.h-3);
-    this.draggableAp.removeMouseDown(); // Remove the ability to drag the window.
-    this.padHandles=false;
+            //Ispaces.log.debug(this.classId+'.snapBottom()');
+            this.divApplication.widthHeight=Common.getWH(this.divApplication);
+            this.divMain.widthHeight=Common.getWH(this.divMain);
+            var widthHeight=this.calculateHalfHeight();
+            this.divMain.wihi(widthHeight[0],widthHeight[1]-3); // Back the bottom off a little because of the shadow.
+            var divApplicationHeight=this.calculateAppDivHalfHeight();
+            this.divApplication.wihi(divApplicationHeight.w,divApplicationHeight.h-3);
+            this.draggableAp.removeMouseDown(); // Remove the ability to drag the window.
+            this.padHandles=false;
         }
 
         , snapLeft:function(){
-    //Ispaces.logger.debug(this.classId+'.snapLeft()');
-    this.divApplication.wh=Common.getWH(this.divApplication);
-    this.divMain.wh=Common.getWH(this.divMain);
-    var wh=this.calculateHalfWidth();
-    this.divMain.wihi(wh[0],wh[1]-3); // Back the bottom off a little because of the shadow.
-    var divApplicationHeight=this.calculateAppDivHalfWidth();
-    this.divApplication.wihi(divApplicationHeight.w,divApplicationHeight.h-3);
-    this.draggableAp.removeMouseDown(); // Remove the ability to drag the window.
-    this.padHandles=false;
+            //Ispaces.log.debug(this.classId+'.snapLeft()');
+            this.divApplication.widthHeight=Common.getWH(this.divApplication);
+            this.divMain.widthHeight=Common.getWH(this.divMain);
+            var widthHeight=this.calculateHalfWidth();
+            this.divMain.wihi(widthHeight[0],widthHeight[1]-3); // Back the bottom off a little because of the shadow.
+            var divApplicationHeight=this.calculateAppDivHalfWidth();
+            this.divApplication.wihi(divApplicationHeight.w,divApplicationHeight.h-3);
+            this.draggableAp.removeMouseDown(); // Remove the ability to drag the window.
+            this.padHandles=false;
         }
 
         , snapRight:function(){
-    //Ispaces.logger.debug(this.classId+'.snapRight()');
-    this.divApplication.wh=Common.getWH(this.divApplication);
-    this.divMain.wh=Common.getWH(this.divMain);
-    var wh=this.calculateHalfWidth();
-    this.divMain.wihi(wh[0],wh[1]-3); // Back the bottom off a little because of the shadow.
-    var divApplicationHeight=this.calculateAppDivHalfWidth();
-    this.divApplication.wihi(divApplicationHeight.w,divApplicationHeight.h-3);
-    this.draggableAp.removeMouseDown(); // Remove the ability to drag the window.
-    this.padHandles=false;
+            //Ispaces.log.debug(this.classId+'.snapRight()');
+            this.divApplication.widthHeight=Common.getWH(this.divApplication);
+            this.divMain.widthHeight=Common.getWH(this.divMain);
+            var widthHeight=this.calculateHalfWidth();
+            this.divMain.wihi(widthHeight[0],widthHeight[1]-3); // Back the bottom off a little because of the shadow.
+            var divApplicationHeight=this.calculateAppDivHalfWidth();
+            this.divApplication.wihi(divApplicationHeight.w,divApplicationHeight.h-3);
+            this.draggableAp.removeMouseDown(); // Remove the ability to drag the window.
+            this.padHandles=false;
         }
 
         , snapTopLeft:function(){
-    //Ispaces.logger.debug(this.classId+'.snapTopLeft()');
-    this.divApplication.wh=Common.getWH(this.divApplication);
-    this.divMain.wh=Common.getWH(this.divMain);
+            //Ispaces.log.debug(this.classId+'.snapTopLeft()');
+            this.divApplication.widthHeight=Common.getWH(this.divApplication);
+            this.divMain.widthHeight=Common.getWH(this.divMain);
 
-    var w=this.calculateHalfWidth();
-    var h=this.calculateHalfHeight();
-    this.divMain.wihi(w.w,h.h);
+            var w=this.calculateHalfWidth();
+            var h=this.calculateHalfHeight();
+            this.divMain.wihi(w.w,h.h);
 
-    var divApplicationWidth=this.calculateAppDivHalfWidth();
-    var divApplicationHeight=this.calculateAppDivHalfHeight();
-    this.divApplication.wihi(divApplicationWidth.w,divApplicationHeight.h);
+            var divApplicationWidth=this.calculateAppDivHalfWidth();
+            var divApplicationHeight=this.calculateAppDivHalfHeight();
+            this.divApplication.wihi(divApplicationWidth.w,divApplicationHeight.h);
 
-    this.draggableAp.removeMouseDown(); // Remove the ability to drag the window.
-    this.padHandles=false;
+            this.draggableAp.removeMouseDown(); // Remove the ability to drag the window.
+            this.padHandles=false;
         }
 
         , snapTopRight:function(){
-    //Ispaces.logger.debug(this.classId+'.snapTopRight()');
+            //Ispaces.log.debug(this.classId+'.snapTopRight()');
 
-    this.divApplication.wh=Common.getWH(this.divApplication);
-    this.divMain.wh=Common.getWH(this.divMain);
+            this.divApplication.widthHeight=Common.getWH(this.divApplication);
+            this.divMain.widthHeight=Common.getWH(this.divMain);
 
-    var w=this.calculateHalfWidth();
-    var h=this.calculateHalfHeight();
-    this.divMain.wihi(w.w,h.h);
+            var w=this.calculateHalfWidth();
+            var h=this.calculateHalfHeight();
+            this.divMain.wihi(w.w,h.h);
 
-    var divApplicationWidth=this.calculateAppDivHalfWidth();
-    var divApplicationHeight=this.calculateAppDivHalfHeight();
-    this.divApplication.wihi(divApplicationWidth.w,divApplicationHeight.h);
+            var divApplicationWidth=this.calculateAppDivHalfWidth();
+            var divApplicationHeight=this.calculateAppDivHalfHeight();
+            this.divApplication.wihi(divApplicationWidth.w,divApplicationHeight.h);
 
-    this.draggableAp.removeMouseDown(); // Remove the ability to drag the window.
-    this.padHandles=false;
+            this.draggableAp.removeMouseDown(); // Remove the ability to drag the window.
+            this.padHandles=false;
         }
 
   /*
   ,hideHandles:function(){
-    Ispaces.logger.debug(this.classId+'.hideHandles()');
-    Ispaces.logger.debug(this.classId+'.hideHandles(): this.handles.length = '+this.handles.length);
+    Ispaces.log.debug(this.classId+'.hideHandles()');
+    Ispaces.log.debug(this.classId+'.hideHandles(): this.handles.length = '+this.handles.length);
     for(var i=0;i<this.handles.length;i++){
       this.handles[i].hide();
       //this.s.hi(0);
@@ -2493,8 +2435,8 @@ Ispaces.Common.extend(
   }
 
   ,showHandles:function(){
-    Ispaces.logger.debug(this.classId+'.showHandles()');
-    //Ispaces.logger.alert(this.classId+'.showHandles(): this.handles.length = '+this.handles.length);
+    Ispaces.log.debug(this.classId+'.showHandles()');
+    //Ispaces.log.alert(this.classId+'.showHandles(): this.handles.length = '+this.handles.length);
     for(var i=0;i<this.handles.length;i++){
       this.handles[i].show();
     }
@@ -2502,64 +2444,64 @@ Ispaces.Common.extend(
   */
 
         , getDateTh:function(dayOfWeek,dayOfMonth){
-    Ispaces.logger.debug(this.classId+'.getDateTh('+dayOfWeek+','+dayOfMonth+')');
-    var sb = new Ispaces.StringBuilder();
-    sb.append(dayOfWeek);
-    sb.append(COMMASPACE);
-    sb.append(this.getMnth());
-    sb.append(Ispaces.Constants.Characters.SPACE);
-    sb.append(this.getTh(dayOfMonth));
-    sb.append(Ispaces.Constants.Characters.SPACE);
-    sb.append(this.year);
-    Ispaces.logger.debug(this.classId+'.getDateTh('+dayOfWeek+','+dayOfMonth+') = '+sb.asString());
-    return sb.asString();
+            Ispaces.log.debug(this.classId+'.getDateTh('+dayOfWeek+','+dayOfMonth+')');
+            var sb = new Ispaces.StringBuilder();
+            sb.append(dayOfWeek);
+            sb.append(COMMASPACE);
+            sb.append(this.getMnth());
+            sb.append(Ispaces.Constants.Characters.SPACE);
+            sb.append(this.getTh(dayOfMonth));
+            sb.append(Ispaces.Constants.Characters.SPACE);
+            sb.append(this.year);
+            Ispaces.log.debug(this.classId+'.getDateTh('+dayOfWeek+','+dayOfMonth+') = '+sb.asString());
+            return sb.asString();
         }
 
         , getDayTh:function(dayOfWeek,dayOfMonth){
-    Ispaces.logger.debug(this.classId+'.getDayTh('+dayOfWeek+','+dayOfMonth+')');
-    var sb = new Ispaces.StringBuilder();
-    sb.append(dayOfWeek);
-    sb.append(Ispaces.Constants.Characters.SPACE);
-    sb.append(this.getTh(dayOfMonth));
-    Ispaces.logger.debug(this.classId+'.getDayTh('+dayOfWeek+','+dayOfMonth+') = '+sb.asString());
-    return sb.asString();
+            Ispaces.log.debug(this.classId+'.getDayTh('+dayOfWeek+','+dayOfMonth+')');
+            var sb = new Ispaces.StringBuilder();
+            sb.append(dayOfWeek);
+            sb.append(Ispaces.Constants.Characters.SPACE);
+            sb.append(this.getTh(dayOfMonth));
+            Ispaces.log.debug(this.classId+'.getDayTh('+dayOfWeek+','+dayOfMonth+') = '+sb.asString());
+            return sb.asString();
         }
 
         , getTh:function(dayOfMonth){
-    Ispaces.logger.debug(this.classId+'.getTh('+dayOfMonth+')');
-    var sb = new Ispaces.StringBuilder();
-    sb.append(dayOfMonth);
-    switch(dayOfMonth){
-      case 1:
-      case 21:
-      case 31:
-        sb.append(ST);break;
-      case 2:
-      case 22:
-        sb.append(ND);break;
-      case 3:
-      case 23:
-        sb.append(RD);break;
-      default:
-        sb.append(Ispaces.Constants.ElementNames.TH);
-    }
-    Ispaces.logger.debug(this.classId+'.getTh('+dayOfMonth+') = '+sb.asString());
-    return sb.asString();
+            Ispaces.log.debug(this.classId+'.getTh('+dayOfMonth+')');
+            var sb = new Ispaces.StringBuilder();
+            sb.append(dayOfMonth);
+            switch(dayOfMonth){
+              case 1:
+              case 21:
+              case 31:
+                sb.append(ST);break;
+              case 2:
+              case 22:
+                sb.append(ND);break;
+              case 3:
+              case 23:
+                sb.append(RD);break;
+              default:
+                sb.append(Ispaces.Constants.ElementNames.TH);
+            }
+            Ispaces.log.debug(this.classId+'.getTh('+dayOfMonth+') = '+sb.asString());
+            return sb.asString();
         }
 
 ///*
         , getDaysInMonth:function(){
-            Ispaces.logger.debug(this.classId+'.getDaysInMonth()');
-    var daysInMonth=this.DAYS_IN_MONTH[this.month];
-    if(this.month==1&&((this.year%4 == 0)&&(this.year%100!= 0))||(this.year%400==0)){
-      daysInMonth=29;
-    }
-    return daysInMonth;
+            Ispaces.log.debug(this.classId+'.getDaysInMonth()');
+            var daysInMonth=this.DAYS_IN_MONTH[this.month];
+            if(this.month==1&&((this.year%4 == 0)&&(this.year%100!= 0))||(this.year%400==0)){
+              daysInMonth=29;
+            }
+            return daysInMonth;
         }
 //*/
 /* Using a switch statement to get days of month
   getDaysInMonth:function(){
-    Ispaces.logger.debug(this.classId+'.getDaysInMonth()');
+    Ispaces.log.debug(this.classId+'.getDaysInMonth()');
     var days=0;
     switch(this.month){
       case 1:case 3:case 5:case 8:case 10:case 12:days=31;break;
@@ -2580,283 +2522,287 @@ Ispaces.Common.extend(
 */
 
         , getEntryCount:function(){
-            Ispaces.logger.debug(this.classId+'.getEntryCount()');
-    /*
-    var entryCount=this.store.get(this.entryCountName);
-    Ispaces.logger.debug(this.classId+'.getEntryCount(): entryCount = "'+entryCount+'"');
-    //if(entryCount&&(!entryCount==NaN)){
-    if(entryCount){
-      return parseInt(entryCount);
-    }else{
-      return 0;
-    }
-    */
-  }
+            Ispaces.log.debug(this.classId+'.getEntryCount()');
+            /*
+            var entryCount=this.store.get(this.entryCountName);
+            Ispaces.log.debug(this.classId+'.getEntryCount(): entryCount = "'+entryCount+'"');
+            //if(entryCount&&(!entryCount==NaN)){
+            if(entryCount){
+              return parseInt(entryCount);
+            }else{
+              return 0;
+            }
+            */
+        }
 
         , getEntries:function(){
-            Ispaces.logger.debug(this.classId+'.getEntries()');
-    Ispaces.logger.debug(this.classId+'.getEntries(): this.entryCount = '+this.entryCount);
-    for(var i=0;i<this.entryCount;i++){
-      Ispaces.logger.debug(this.classId+'.getEntries(): entry'+i);
-      /*
-      this.store.get('entry'+i,function(ok,val){
-        if(ok){
-          Ispaces.logger.error(this.classId+'.getEntries(): entry'+i+', val = ' + val);
-          if(!isNull(val)){
-            Ispaces.logger.debug(this.classId+'.getEntries(): isNull(val) = ' + (isNull(val)));
-            //var entry=JSON.parse(val);
-            var entry=eval(Common.parens(val));
-            //Ispaces.logger.error(this.classId+'.getEntries(): entry'+i+', entry = '+entry);
-            //Ispaces.logger.error(this.classId+'.getEntries(): entry'+i+', typeof entry = '+typeof entry);
-            //Ispaces.logger.printObject(entry);
-            //for(var n in entry){
-              //Ispaces.logger.debug('n = '+n);
-              //alert('entry['+n+'] = '+entry[n]);
-              //var v = entry[n];
-              //alert(n+' = '+v);
-            //}
-            //for(var object
-            //Ispaces.logger.error(this.classId+'.getEntries(): entry'+i+', entry.what = '+entry.what);
-            //Ispaces.logger.error(this.classId+'.getEntries(): entry'+i+', entry.when = '+entry.when);
-            Ispaces.logger.debug(this.classId+'.getEntries(): entry'+i+', entry[where] = '+entry['where']);
-          }
-        }
-      });
-      */
-    }
+            Ispaces.log.debug(this.classId+'.getEntries()');
+            Ispaces.log.debug(this.classId+'.getEntries(): this.entryCount = '+this.entryCount);
+            for(var i=0;i<this.entryCount;i++){
+              Ispaces.log.debug(this.classId+'.getEntries(): entry'+i);
+              /*
+              this.store.get('entry'+i,function(ok,val){
+                if(ok){
+                  Ispaces.log.error(this.classId+'.getEntries(): entry'+i+', val = ' + val);
+                  if(!isNull(val)){
+                    Ispaces.log.debug(this.classId+'.getEntries(): isNull(val) = ' + (isNull(val)));
+                    //var entry=JSON.parse(val);
+                    var entry=eval(Common.parens(val));
+                    //Ispaces.log.error(this.classId+'.getEntries(): entry'+i+', entry = '+entry);
+                    //Ispaces.log.error(this.classId+'.getEntries(): entry'+i+', typeof entry = '+typeof entry);
+                    //Ispaces.log.printObject(entry);
+                    //for(var n in entry){
+                      //Ispaces.log.debug('n = '+n);
+                      //alert('entry['+n+'] = '+entry[n]);
+                      //var v = entry[n];
+                      //alert(n+' = '+v);
+                    //}
+                    //for(var object
+                    //Ispaces.log.error(this.classId+'.getEntries(): entry'+i+', entry.what = '+entry.what);
+                    //Ispaces.log.error(this.classId+'.getEntries(): entry'+i+', entry.when = '+entry.when);
+                    Ispaces.log.debug(this.classId+'.getEntries(): entry'+i+', entry[where] = '+entry['where']);
+                  }
+                }
+              });
+              */
+            }
         }
 
         , createCalItemsDiv:function(calItems,day){
-            Ispaces.logger.debug(this.classId+'.createCalItemsDiv('+calItems+')');
-    Ispaces.logger.debug(this.classId+'.createCalItemsDiv('+calItems+'): calItems.length = '+calItems.length);
+            Ispaces.log.debug(this.classId+'.createCalItemsDiv('+calItems+')');
+            Ispaces.log.debug(this.classId+'.createCalItemsDiv('+calItems+'): calItems.length = '+calItems.length);
 
-    var bgColor='#fff888';
-    //var bgColor='#FFD324';
-    //var bgColor='#ffee88';
-    var color='#333';
+            var bgColor='#fff888';
+            //var bgColor='#FFD324';
+            //var bgColor='#ffee88';
+            var color='#333';
 
-    var outerDiv=this.Create.createDiv();
-    //outerDiv.bo('green 1px solid');
-    outerDiv.alT();
-    //outerDiv.wiphip(100);
-    //outerDiv.ow(Ispaces.Constants.Properties.HIDDEN);
-    var dayDiv=this.Create.createDiv();
-    //dayDiv.ba(ORANGE);
-    //dayDiv.ba('#ffcc00');
-    //dayDiv.baco('#ffcc00','#fff');
-    //dayDiv.baco('#fffccc','#fff');
-    dayDiv.baco(bgColor,color);
-    dayDiv.fW(Ispaces.Constants.Properties.BOLD);
-    dayDiv.pa('0 0 0 2px');
-    dayDiv.add(this.Create.createText(day));
-    outerDiv.add(dayDiv);
-    //outerDiv.ma('1px');
-    for(var i=0;i<calItems.length;i++){
-      var innerDiv=this.Create.createDiv();
-      innerDiv.bo(bgColor+' 1px solid');
-      //innerDiv.ma('1px');
-      var calItemDiv=this.createCalItemDiv(calItems[i]);
-      calItemDiv.hide();
-      var calItemSummary=this.getCalItemSummary(calItems[i]);
-      innerDiv.add(this.Create.createText(calItemSummary));
-      innerDiv.add(calItemDiv);
-      //div.hide();
-      outerDiv.add(innerDiv);
-    }
-    return outerDiv;
+            var outerDiv=this.Create.createDiv();
+            //outerDiv.bo('green 1px solid');
+            outerDiv.alT();
+            //outerDiv.wiphip(100);
+            //outerDiv.ow(Ispaces.Constants.Properties.HIDDEN);
+            var dayDiv=this.Create.createDiv();
+            //dayDiv.ba(ORANGE);
+            //dayDiv.ba('#ffcc00');
+            //dayDiv.baco('#ffcc00','#fff');
+            //dayDiv.baco('#fffccc','#fff');
+            dayDiv.baco(bgColor,color);
+            dayDiv.fW(Ispaces.Constants.Properties.BOLD);
+            dayDiv.pa('0 0 0 2px');
+            dayDiv.add(this.Create.createText(day));
+            outerDiv.add(dayDiv);
+            //outerDiv.ma('1px');
+            for(var i=0;i<calItems.length;i++){
+              var innerDiv=this.Create.createDiv();
+              innerDiv.bo(bgColor+' 1px solid');
+              //innerDiv.ma('1px');
+              var calItemDiv=this.createCalItemDiv(calItems[i]);
+              calItemDiv.hide();
+              var calItemSummary=this.getCalItemSummary(calItems[i]);
+              innerDiv.add(this.Create.createText(calItemSummary));
+              innerDiv.add(calItemDiv);
+              //div.hide();
+              outerDiv.add(innerDiv);
+            }
+            return outerDiv;
         }
 
         , getCalItemSummary:function(calItem){
-    var sb=new Ispaces.StringBuilder();
-    sb.append(calItem.what);
-    sb.append(', ');
-    sb.append(calItem.when);
-    sb.append(' at ');
-    sb.append(calItem.where);
-    return sb.asString()
+            var sb=new Ispaces.StringBuilder();
+            sb.append(calItem.what);
+            sb.append(', ');
+            sb.append(calItem.when);
+            sb.append(' at ');
+            sb.append(calItem.where);
+            return sb.asString()
         }
 
         , createCalItemDiv:function(calItem){
-    Ispaces.logger.debug(this.classId+'.createCalItemDiv('+calItem+')');
-    Ispaces.logger.debug(this.classId+'.createCalItemDiv('+calItem+'): calItem.what = '+calItem.what);
-    var div=this.Create.createDiv();
-    var what=this.Create.createText(calItem.what);
-    var when=this.Create.createText(calItem.when);
-    var where=this.Create.createText(calItem.where);
-    var notes=this.Create.createText(calItem.notes);
-    div.add(what);
-    div.add(this.Create.createText('\n'));
-    div.add(when);
-    div.add(this.Create.createText('\n'));
-    div.add(where);
-    div.add(this.Create.createText('\n'));
-    div.add(notes);
-    return div;
-  }
+            Ispaces.log.debug(this.classId+'.createCalItemDiv('+calItem+')');
+            Ispaces.log.debug(this.classId+'.createCalItemDiv('+calItem+'): calItem.what = '+calItem.what);
+            var div=this.Create.createDiv();
+            var what=this.Create.createText(calItem.what);
+            var when=this.Create.createText(calItem.when);
+            var where=this.Create.createText(calItem.where);
+            var notes=this.Create.createText(calItem.notes);
+            div.add(what);
+            div.add(this.Create.createText('\n'));
+            div.add(when);
+            div.add(this.Create.createText('\n'));
+            div.add(where);
+            div.add(this.Create.createText('\n'));
+            div.add(notes);
+            return div;
+        }
 
         , getCalItemsByDay:function(dayOfMonth){
-            Ispaces.logger.debug(this.classId+'.getCalItemsByDay('+dayOfMonth+')');
-    Ispaces.logger.debug(this.classId+'.getCalItemsByDay(): this.entries.length = '+this.entries.length);
-    var calItems=[];
-    for(var i=0;i<this.entries.length;i++){
-      var calItem=this.entries[i];
-      //Ispaces.logger.debug(this.classId+'.getCalItemsByDay('+dayOfMonth+'): calItem[\'what\'] = '+calItem['what']);
-      //Ispaces.logger.debug(this.classId+'.getCalItemsByDay('+dayOfMonth+'): calItem[\'day\'] = '+calItem['day']);
-      if(calItem[YEAR]==this.year){
-        if(calItem[MONTH]==this.month){
-          if(calItem[DAY]==dayOfMonth){
-            calItems.push(calItem);
-          }
+            Ispaces.log.debug(this.classId+'.getCalItemsByDay('+dayOfMonth+')');
+            Ispaces.log.debug(this.classId+'.getCalItemsByDay(): this.entries.length = '+this.entries.length);
+            var calItems=[];
+            for(var i=0;i<this.entries.length;i++){
+              var calItem=this.entries[i];
+              //Ispaces.log.debug(this.classId+'.getCalItemsByDay('+dayOfMonth+'): calItem[\'what\'] = '+calItem['what']);
+              //Ispaces.log.debug(this.classId+'.getCalItemsByDay('+dayOfMonth+'): calItem[\'day\'] = '+calItem['day']);
+              if(calItem[YEAR]==this.year){
+                if(calItem[MONTH]==this.month){
+                  if(calItem[DAY]==dayOfMonth){
+                    calItems.push(calItem);
+                  }
+                }
+              }
+            }
+            return calItems;
         }
-      }
-    }
-    return calItems;
-  }
 
         , addEntry:function(o){
             this.entries.push(o);
         }
 
-  //updateEntries:function(o,id){
+        //updateEntries:function(o,id){
         , updateStore:function(id,o){
-    Ispaces.logger.alert(this.classId+'.updateStore:('+id+',o)');
-    Ispaces.logger.debug(this.classId+'.updateStore:('+id+',o): this.entries = '+this.entries.length);
-    this.addEntry(o);
-    Ispaces.logger.debug(this.classId+'.updateStore:('+id+',o): this.entries = '+this.entries.length);
-    var json=JSON.stringify(this.entries);
-    Ispaces.logger.alert(this.classId+'.updateStore:('+id+',o): json = '+json);
-    Ispaces.logger.debug(this.classId+'.updateStore:('+id+',o): this.store.set(id,json)');
-    //this.store.set(id,json);
-  }
-
-        , showEntries:function(){
-            Ispaces.logger.debug(this.classId+'.showEntries()');
-    //var entries=this.store.get('entries');
-    var _this=this;
-    var entries=null;
-    /*
-    this.store.get(this.entriesName,function(ok,val){
-      if(ok){
-        //Ispaces.logger.debug(this.classId+'.showEntries(): val = '+val);
-        Ispaces.logger.debug('.showEntries(): val = '+val);
-        if(val){
-          entries=val;
-          Ispaces.logger.debug('.showEntries(): entries = '+entries);
-          _this.entries=JSON.parse(entries);
+            Ispaces.log.alert(this.classId+'.updateStore:('+id+',o)');
+            Ispaces.log.debug(this.classId+'.updateStore:('+id+',o): this.entries = '+this.entries.length);
+            this.addEntry(o);
+            Ispaces.log.debug(this.classId+'.updateStore:('+id+',o): this.entries = '+this.entries.length);
+            var json=JSON.stringify(this.entries);
+            Ispaces.log.alert(this.classId+'.updateStore:('+id+',o): json = '+json);
+            Ispaces.log.debug(this.classId+'.updateStore:('+id+',o): this.store.set(id,json)');
+            //this.store.set(id,json);
         }
-      }
-    });
-    */
-    Ispaces.logger.debug(this.classId+'.showEntries(): entries = '+entries);
 
-    if(entries){
-      //var jsonArray=JSON.parse(entries);
-      var jsonArray=eval(Common.parens(entries));
-      this.entries=jsonArray;
-      if(jsonArray){
-        Ispaces.logger.debug(this.classId+'.showEntries(): jsonArray = '+jsonArray);
-        Ispaces.logger.debug(this.classId+'.showEntries(): typeof jsonArray = '+typeof jsonArray);
-        Ispaces.logger.debug(this.classId+'.showEntries(): jsonArray.length = '+jsonArray.length);
-      }
-    }
+        , showEntries: function() {
+            Ispaces.log.debug(this.classId+'.showEntries()');
+            //var entries=this.store.get('entries');
+            var _this=this;
+            var entries=null;
+            /*
+            this.store.get(this.entriesName,function(ok,val){
+              if(ok){
+                //Ispaces.log.debug(this.classId+'.showEntries(): val = '+val);
+                Ispaces.log.debug('.showEntries(): val = '+val);
+                if(val){
+                  entries=val;
+                  Ispaces.log.debug('.showEntries(): entries = '+entries);
+                  _this.entries=JSON.parse(entries);
+                }
+              }
+            });
+            */
+            Ispaces.log.debug(this.classId+'.showEntries(): entries = '+entries);
 
+            if (entries) {
+                  //var jsonArray=JSON.parse(entries);
+                  var jsonArray=eval(Common.parens(entries));
+                  this.entries=jsonArray;
+                  if(jsonArray){
+                    Ispaces.log.debug(this.classId+'.showEntries(): jsonArray = '+jsonArray);
+                    Ispaces.log.debug(this.classId+'.showEntries(): typeof jsonArray = '+typeof jsonArray);
+                    Ispaces.log.debug(this.classId+'.showEntries(): jsonArray.length = '+jsonArray.length);
+                  }
+            }
             _this=null;
-
         }
 
-        , removeEntries : function() {
-            Ispaces.logger.debug(this.classId+'.removeEntries()');
-    //this.store.remove(this.entriesName);
-/*
-    Ispaces.logger.debug(this.classId+'.removeEntries(): this.entryCount = '+this.entryCount);
-    for(var i=0;i<this.entryCount;i++){
-      Ispaces.logger.debug(this.classId+'.removeEntries(): entry'+i);
-      this.store.remove('entry'+i,function(ok,val){
-        if(ok){
-          Ispaces.logger.error(this.classId+'.removeEntries(): REMOVED entry'+i+', val = ' + val);
+        , removeEntries: function() {
+            Ispaces.log.debug(this.classId+'.removeEntries()');
+            //this.store.remove(this.entriesName);
+            /*
+            Ispaces.log.debug(this.classId+'.removeEntries(): this.entryCount = '+this.entryCount);
+            for(var i=0;i<this.entryCount;i++){
+              Ispaces.log.debug(this.classId+'.removeEntries(): entry'+i);
+              this.store.remove('entry'+i,function(ok,val){
+                if(ok){
+                  Ispaces.log.error(this.classId+'.removeEntries(): REMOVED entry'+i+', val = ' + val);
+                }
+              });
+            }
+            this.entryCount=0;
+            this.store.set(this.entryCountName,(this.entryCount));
+            */
         }
-      });
-    }
-    this.entryCount=0;
-    this.store.set(this.entryCountName,(this.entryCount));
-*/
-        }
 
-        , drag : function(x,y,draggable){
-            Ispaces.logger.debug(this.id+'.drag('+x+', '+y+', '+draggable+')');
+        , drag: function(x,y,draggable){
+            Ispaces.log.debug(this.id+'.drag('+x+', '+y+', '+draggable+')');
+            var windowDiv=this.windowDiv;
+            var windowXY = windowDiv._xy
+            , windowWH = windowDiv._wh
+            ;
+            if(!windowXY) windowXY=windowDiv._xy=Common.getXY(windowDiv);
+            if(!windowWH) windowWH=windowDiv._wh=Common.getWH(windowDiv);
 
-    var windowDiv=this.windowDiv;
+            var windowX = windowXY[0]
+            , windowY = windowXY[1]
+            , windowW = windowWH[0]
+            , windowH = windowWH[1]
+            ;
 
-    var windowXY=windowDiv._xy
-      ,windowWH=windowDiv._wh
-    ;
+            if (
+              (x>windowX)
+              &&(x<(windowX+windowW))
+              &&(y>windowY)
+              &&(y<(windowY+windowH))
+            ){
 
-    if(!windowXY)windowXY=windowDiv._xy=Common.getXY(windowDiv);
-    if(!windowWH)windowWH=windowDiv._wh=Common.getWH(windowDiv);
+              if(!this.isOver){
+                this.isOver=true;
+                this.mouseEnter(draggable);
+              }
 
-    var windowX=windowXY[0]
-      ,windowY=windowXY[1]
-      ,windowW=windowWH[0]
-      ,windowH=windowWH[1]
-    ;
+              return true; // handled!
 
-    if(
-      (x>windowX)
-      &&(x<(windowX+windowW))
-      &&(y>windowY)
-      &&(y<(windowY+windowH))
-    ){
-
-      if(!this.isOver){
-        this.isOver=true;
-        this.mouseEnter(draggable);
-      }
-
-      return true; // handled!
-
-    }else if(this.isOver){
-      this.isOver=false;
-    }
+            }else if(this.isOver){
+              this.isOver=false;
+            }
 
             return false; // not handled!
         }
 
-        , mouseEnter : function(draggable) {
-            Ispaces.logger.debug(this.id+'.mouseEnter(draggable:'+draggable+')');
-
+        , mouseEnter: function(draggable) {
+            Ispaces.log.debug(this.id+'.mouseEnter(draggable:'+draggable+')');
             draggable.rowBottom.hide();
             draggable.isOverDesktop=false;
         }
 
-        , destroySave : function(e) {
-            Ispaces.logger.debug(this.classId+'.destroySave('+e+')');
-
-        this.resizableWindow.hid(); // First off hide the window.. Calls ResizableWindow.windowDiv.hid()
-
-        if(e)Common.stopEvent(e);
-        var id=this.id;
-        //new Ispaces.AsyncApply(this,this.destroy,null,50);
-        new Ispaces.AsyncCall(this,this.destroy,50);
+        /*
+        , destroySave: function(eventObject) {
+            Ispaces.log.debug(this.classId+'.destroySave('+eventObject+')');
+            this.resizableWindow.hide(); // First off hide the window.. Calls ResizableWindow.windowDiv.hid()
+            if(eventObject) Ispaces.Events.stopEvent(eventObject);
+            var id = this.id;
+            //new Ispaces.AsyncApply(this,this.destroy,null,50);
+            new Ispaces.AsyncCall(this,this.destroy,50);
         }
 
-        , destroy : function() {
-            Ispaces.logger.debug(this.classId+'.destroy()');
-
+        , destroy: function() {
+            Ispaces.log.debug(this.classId+'.destroy()');
             this.resizableWindow.destroyWindow();
             Ispaces.spaces.space.removeAp(this);
             Ispaces.spaces.space.store.remove(this.id);
-
-            for(var p in this){
-                this[p]=null;
+            for (var p in this) {
+                this[p] = null;
                 delete this[p];
             }
+        }
+        */
+
+        , setWidthPixels: function(w) {
+            Ispaces.log.debug(this.id+'.setWidthPixels('+w+')');
+            this.divMain.setWidthPixels(w);
+            this.divApplication.setWidthPixels(w);
+        }
+
+        , setHeightPixels: function(h) {
+            Ispaces.log.debug(this.id+'.setHeightPixels('+h+')');
+            this.divMain.setHeightPixels(h-33);
+            this.divApplication.setHeightPixels(h);
         }
 
     }
 );
 
 Ispaces.Calendar['start'] = function(config) {
-    Ispaces.logger.debug('Ispaces.Calendar.start('+config+')');
-    console.log('Ispaces.Calendar.start('+config+')');
-    window['ispacesCalendar'] = new Ispaces.Calendar(config);
+    Ispaces.log.debug('Ispaces.Calendar.start('+config+')');
+    //window['ispacesCalendar'] = new Ispaces.Calendar(config);
+    return new Ispaces.Calendar(config);
 };
