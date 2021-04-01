@@ -20,7 +20,7 @@
     //jsUrlBuilder.append("/obfus/");
     //jsUrlBuilder.append("/js-comma-separated/");
     jsUrlBuilder.append(obfuscatedClassesBuilder);
-    jsUrlBuilder.append("?").append("obfus=true");
+    jsUrlBuilder.append("?").append("obfus=false");
     jsUrlBuilder.append("&").append(new java.util.Date().getTime());
     /*
     if(extraParamsMap != null) {

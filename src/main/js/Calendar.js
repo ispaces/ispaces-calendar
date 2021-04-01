@@ -28,7 +28,7 @@ Ispaces.Common.extend(
           classId: 'Calendar'
         , appName: 'Calendar'
         , title : 'Calendar'
-        , WidthHeight: [400,400]
+        , WidthHeight: [888, 480]
         //*String*/ , ICON_IMG : Ispaces.Constants.Paths.IMAGES+'test/cal.gif'
         /*Array*/  , MONTHS : ['January','February','March','April','May','June','July','August','September','October','November','December']
         /*Array*/  , MONTHS_ABBR : ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
@@ -47,13 +47,10 @@ Ispaces.Common.extend(
         , Create: Ispaces.Create
 
         , Constants: (function() {
-
             var Constants = Ispaces.Constants
             , Characters = Constants.Characters
             ;
-
             return {
-
                   FORWARDSLASH : Characters.FORWARDSLASH
                 , EMPTY : Characters.EMPTY
                 , COLON : Characters.COLON
@@ -70,13 +67,10 @@ Ispaces.Common.extend(
                 , F7F7F7 : '#f7f7f7'
                 , CCC1 : '#ccc 1px solid'
             }
-
         })()
 
         , Events: (function() {  // "Events" property to reference events used in this application
-
             var Events = Ispaces.Constants.Events;
-
             return {
                 CLICK       : Events.CLICK
               , MOUSEUP     : Events.MOUSEUP
@@ -84,7 +78,6 @@ Ispaces.Common.extend(
               , MOUSEMOVE   : Events.MOUSEMOVE
               , CONTEXTMENU : Events.CONTEXTMENU
             }
-
         })()
 
         , configure: function(config) {  // the config object can be passed to this configure the application

@@ -16,7 +16,7 @@
 
         , {
               "context-path": "/js"
-            , "webapp-path": "../../../Javapoet/ispaces-javascript-server/build/exploded"
+            , "webapp-path": "../../ispaces-javascript-server/build/exploded"
             , "virtual-hosts": [
                   "localhost"
                 , "dev.ispaces.com"
