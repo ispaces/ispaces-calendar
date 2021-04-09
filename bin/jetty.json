@@ -1,10 +1,7 @@
-  {
-
+{
       "server": "0.0.0.0"
     , "port"  : 8080
-
     , "contexts": [
-
          {
               "context-path": "/"
             , "webapp-path": "../build/exploded"
@@ -13,7 +10,6 @@
                 , "dev.ispaces.com"
             ]
         }
-
         , {
               "context-path": "/js"
             , "webapp-path": "../../ispaces-javascript-server/build/exploded"
@@ -22,7 +18,5 @@
                 , "dev.ispaces.com"
             ]
         }
-        
     ]
-
 }

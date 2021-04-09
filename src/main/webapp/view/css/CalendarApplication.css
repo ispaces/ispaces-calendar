@@ -1,0 +1,292 @@
+body {
+    -webkit-touch-callout: none;                /* prevent callout to copy image, etc when tap to hold */
+    -webkit-text-size-adjust: none;             /* prevent webkit from resizing text to fit */
+    -webkit-user-select: none;                  /* prevent copy paste, to allow, change 'none' to 'text' */
+    /*
+    background-color:#E4E4E4;
+    background-image:linear-gradient(top, #A7A7A7 0%, #E4E4E4 51%);
+    font-family: system-ui, -apple-system, -apple-system-font, 'Segoe UI', 'Roboto', sans-serif;
+    font-size:12px;
+    */
+    font-family: system-ui, 'Roboto', sans-serif;
+    height:100vh;
+    margin:0px;
+    padding:0px;
+    /* Padding to avoid the "unsafe" areas behind notches in the screen */
+    padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-right, 0px);
+    width:100%;
+}
+
+/*
+@media screen and (min-aspect-ratio: 1/1) and (min-width:400px) {
+    .app {
+        background-position:left center;
+        padding:75px 0px 75px 170px;
+        margin:-90px 0px 0px -198px;
+    }
+}
+*/
+
+:root {
+  --orange: #FF8F00;
+  --gray: #8B9290;
+  --medium-gray: #C0C5C4;
+  --light-gray: #EDF0EE;
+  --dark-green: #0E4F24;
+  --medium-green: #4B8029;
+  --light-green: #B4CD8F;
+  --dark-text: #322;
+  --medium-text: #6B6D6B;
+  --site-width: 900px;
+  --search-block-width: 366px;
+}
+
+/*
+*
+{
+  border: red 1px solid;
+}
+*/
+
+div.table
+{
+  display: table;
+  width: 100%;
+}
+
+div.row
+{
+  display: table-row;
+}
+
+div.cell
+{
+  display: table-cell;
+}
+
+html
+, body
+{
+  height:100%;
+  background-color: #fff;
+  margin: 0px;
+}
+
+body
+{
+  background-color:#fff;
+  margin:0;
+  height:100%;
+  font-family:arial;
+  font-size:13px;
+}
+
+h1
+{
+  font-weight: 500;
+  font-size: 25px;
+  padding: 10px;
+}
+
+.div-header
+{
+<%--
+  border: 0px;
+  border: #000 1px solid;
+--%>
+  margin-right:10px;
+}
+
+.window-title
+{
+<%--
+  border: 0px;
+  border: #999 1px solid;
+  padding: 6px 12px;
+--%>
+  border: 0px;
+  background-color: #4169E1;
+  background-color:#fff;
+  color: #fff;
+  color: #000;
+  font-size:20px;
+}
+
+.output
+{
+  font-size:15px;
+  padding: 10px;
+<%--
+  border: #000 1px solid;
+  border: #4169E1 1px solid;
+  background-color: #4169E1;
+  color: #fff;
+  background-color:#fff;
+  color: #000;
+--%>
+}
+
+.CalendarApplication
+{
+  border: blue 1px solid;
+<%--
+  border: 0px;
+--%>
+}
+
+.CalendarApplication
+.buttons .positive-notop0
+{
+  background:#D2E0FA;
+  border-top:#fff 1px solid;
+  border-left:#fff 1px solid;
+  border-right:1px #5a5a5a solid;
+  border-bottom:1px #5a5a5a solid;
+  text-shadow:#fff 0px 1px 0, #333 0 -1px 0;
+  color:#5A5A5A;
+}
+
+.CalendarApplication
+.buttons .positive-notop1
+{
+  background:#a5c0f5;
+  border-top:#DAE3FB 1px solid;
+  border-left:#DAE3FB 1px solid;
+  border-right:1px #5a5a5a solid;
+  border-bottom:1px #5a5a5a solid;
+  text-shadow:#D2E0FA 0px 1px 0, #333 0 -1px 0;
+  color:#5A5A5A;
+}
+
+.CalendarApplication
+.buttons .positive-notop12
+{
+  /*
+  background:#a5c0f5 url(http://stage.ispaces.com/view/images/bump/dev/e5e9ef-fff-1x28a.gif) repeat;
+  */
+  background:#a5c0f5;
+  border-top:#dae3fb 1px solid;
+  border-left:1px #E0E7FC solid;
+  border-right:1px #00618c solid;
+  border-bottom:1px #00618c solid;
+  color:#636563;
+}
+
+.CalendarApplication
+.buttons .topmenu
+{
+  background:#a5c0f5;
+  border-top:#dae3fb 1px solid;
+  border-left:1px #E0E7FC solid;
+  border-right:1px #00618c solid;
+  border-bottom:1px #00618c solid;
+  color:#636563;
+}
+
+.CalendarApplication
+.buttons .topmenu-right
+{
+  /*
+  background:#a5c0f5 url(http://stage.ispaces.com/view/images/arrow/blue/right.gif) no-repeat center center;
+  */
+  background:#a5c0f5;
+  border-top:#dae3fb 1px solid;
+  border-left:1px #E0E7FC solid;
+  border-right:1px #00618c solid;
+  border-bottom:1px #00618c solid;
+  color:#636563;
+}
+
+.CalendarApplication
+.buttons .topmenu-right:hover
+{
+  /*
+  background:#a5c0f5 url(http://stage.ispaces.com/view/images/arrow/blue/right-on.gif) no-repeat center center;
+  */
+  background:#a5c0f5;
+  border-top:#dae3fb 1px solid;
+  border-left:1px #E0E7FC solid;
+  border-right:1px #00618c solid;
+  border-bottom:1px #00618c solid;
+  color:#636563;
+}
+
+.CalendarApplication
+.buttons .topmenu-left
+{
+  /*
+  background:#a5c0f5 url(http://stage.ispaces.com/view/images/arrow/blue/left.gif) no-repeat center center;
+  */
+  background:#a5c0f5;
+  border-top:#dae3fb 1px solid;
+  border-left:1px #E0E7FC solid;
+  border-right:1px #00618c solid;
+  border-bottom:1px #00618c solid;
+  color:#636563;
+}
+
+.CalendarApplication
+.buttons .topmenu-left:hover
+{
+  /*
+  background:#a5c0f5 url(http://stage.ispaces.com/view/images/arrow/blue/left-on.gif) no-repeat center center;
+  */
+  background:#a5c0f5;
+  border-top:#dae3fb 1px solid;
+  border-left:1px #E0E7FC solid;
+  border-right:1px #00618c solid;
+  border-bottom:1px #00618c solid;
+  color:#636563;
+}
+
+.CalendarApplication
+table.month
+{
+  width: 100%;
+  height: 100%;
+  /*
+  */
+  background-color: #ccc;
+}
+
+.CalendarApplication
+div.month-div
+{
+  border: red 1px solid;
+}
+
+.CalendarApplication
+table.month th
+{
+  color:#6c6c6c;
+  background:#f0f3fe;
+  font-weight:bold;
+  font-size:14px;
+}
+
+.CalendarApplication
+table.month td.weekend
+{
+  background:#ebeffe;
+}
+
+.CalendarApplication
+table.month td.weekend-on
+{
+  background:#ffcc00;
+  color:#fff;
+}
+
+.CalendarApplication
+table.month td.today
+{
+  background:#fffccc;
+}
+
+/*
+*/
+.CalendarApplication
+table.month td, .CalendarApplication table.month td.off
+{
+  background:#fff;
+}

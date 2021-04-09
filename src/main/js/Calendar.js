@@ -262,7 +262,6 @@ Ispaces.Common.extend(
             return divTableContainer
         }
 
-
         , createMain: function() {
             Ispaces.log.debug(this.classId+'.createMain()');
             //var main=this.Create.createElement(Ispaces.Constants.ElementNames.DIV);

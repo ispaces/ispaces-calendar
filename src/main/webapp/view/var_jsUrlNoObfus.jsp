@@ -1,27 +1,42 @@
 <%
 
-    String[] classNames = (String[])request.getAttribute("classNames");
-    if(classNames == null) throw new Exception("classNames == null");
-    if(classNames.length == 0) throw new Exception("classNames.length == 0");
+    //String[] jsClassNames = request.getParameter("jsClassNames");
+    String[] jsClassNames = (String[])request.getAttribute("jsClassNames");
+
+    if(jsClassNames == null) throw new Exception("jsClassNames == null");
+    if(jsClassNames.length == 0) throw new Exception("jsClassNames.length == 0");
+
+    String obfuscate = request.getParameter("obfuscate");
     String contextUrl = request.getParameter("contextUrl");
-    //String[] classNamesObfuscated = com.ispaces.os.servlet.InitServlet.obfuscator.obfuscate(classNames);
-    //String[] classNamesObfuscated = obfuscator.obfuscate(classNames);
-    //String[] classNamesObfuscated = com.ispaces.js.servlet.InitServlet.obfuscator.obfuscate(classNames);
-    String[] classNamesObfuscated = classNames; // Temporary when ispaces obfuscator not present
+    //String defaultUrl = request.getParameter("defaultUrl");
+
+    //String[] classNamesObfuscated = com.ispaces.os.servlet.InitServlet.obfuscator.obfuscate(jsClassNames);
+    //String[] classNamesObfuscated = obfuscator.obfuscate(jsClassNames);
+    //String[] classNamesObfuscated = com.ispaces.js.servlet.InitServlet.obfuscator.obfuscate(jsClassNames);
+    String[] classNamesObfuscated = jsClassNames; // Temporary when ispaces obfuscator not present
+
     StringBuilder obfuscatedClassesBuilder = new StringBuilder();
+
     int x = 0;
     for(String classNameObfuscated: classNamesObfuscated) {
+
         if(x++ > 0) obfuscatedClassesBuilder.append(",");
         obfuscatedClassesBuilder.append(classNameObfuscated);
     }
+
     StringBuilder jsUrlBuilder = new StringBuilder();
     //jsUrlBuilder.append(contextUrl); // JavaScript URL from same context as ispaces-os.
     jsUrlBuilder.append(contextUrl); // JavaScript URL from same context as ispaces-os.
     //jsUrlBuilder.append("/obfus/");
     //jsUrlBuilder.append("/js-comma-separated/");
     jsUrlBuilder.append(obfuscatedClassesBuilder);
-    jsUrlBuilder.append("?").append("obfus=false");
+    if (obfuscate != null) {
+        jsUrlBuilder.append("?").append("obfus=").append(obfuscate);
+    } else{
+        jsUrlBuilder.append("?").append("obfus=true");
+    }
     jsUrlBuilder.append("&").append(new java.util.Date().getTime());
+  
     /*
     if(extraParamsMap != null) {
 
@@ -39,4 +54,5 @@
         jsUrlBuilder.append(new java.util.Date().getTime());
     }
     */
-%>var ispacesJavascriptUrl='<%= jsUrlBuilder.toString() %>';
+
+%>var jsUrl='<%= jsUrlBuilder.toString() %>';

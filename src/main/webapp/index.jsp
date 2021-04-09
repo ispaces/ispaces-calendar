@@ -20,6 +20,8 @@
       <ul>
         <li><a href="/app/Calendar">/app/Calendar</a></li>
         <li><a href="<%= contextUrl %>/view/app/Calendar.jsp"><%= contextUrl %>/view/app/Calendar.jsp</a></li>
+        <li><a href="<%= contextUrl %>/view/app/CalendarApp.jsp"><%= contextUrl %>/view/app/CalendarApp.jsp</a></li>
+        <li><a href="http://localhost:8080/view/app/CalendarApp.jsp">http://localhost:8080/view/app/CalendarApp.jsp</a></li>
       </ul>
     </body>
 
